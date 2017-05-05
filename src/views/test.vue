@@ -14,14 +14,18 @@ export default {
       msg: 'Use Vue 2.0 Today!'
     }
   },
-
   methods: {
     startHacking () {
-      this.$notify({
-        title: 'It Works',
-        message: 'We have laid the groundwork for you. Now it\'s your time to build something epic!',
-        duration: 6000
-      })
+        
+        if(this.$parent.$data.cout > 0){
+            this.$parent.$data.cout = --this.$parent.$data.cout
+        }
+
+        this.$notify({
+            title: 'It Works',
+            message: 'We have laid the groundwork for you. Now it\'s your time to build something epic!',
+            duration: 6000
+        })
     }
   }
 }
