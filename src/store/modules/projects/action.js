@@ -8,7 +8,6 @@ export function getProjects ({commit, state},data) {
     var _self = data.self
     _self.$http.post(g.debugUrlPrefix+'manageProject/getProject',
         data.info).then((response) => {
-        // success callback
         if(response.body.err){
           _self.$f7.alert("wrong password","error")
         }else{
@@ -18,7 +17,6 @@ export function getProjects ({commit, state},data) {
         }       
       }, (response) => {
         _self.$f7.alert(response.err.toString())
-        // _self.$f7.alert("error occur","error")
       });
 }
 
