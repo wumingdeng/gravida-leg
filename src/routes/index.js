@@ -36,11 +36,11 @@
 
 // Pages
 import home from '../views/login.vue';
-import test from '../views/test.vue';
+import order from '../views/order.vue';
 
 export default [
   {
     path: '/',
-    component: test
+    component: order
   }
 ];

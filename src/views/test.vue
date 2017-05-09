@@ -17,29 +17,10 @@ export default {
   },
   methods: {
     startHacking () {
-        
-        if(this.$parent.$data.cout > 0){
-            this.$parent.$data.cout = --this.$parent.$data.cout
-        }
-
-        // this.$notify({
-        //     title: 'It Works',
-        //     message: 'We have laid the groundwork for you. Now it\'s your time to build something epic!',
-        //     duration: 6000
-        // })
-        var postData =  api.getOrderTracesByJson("YTO","12345678") 
-
-        this.$http.post(api.url,
-          postData).then((response) => {
-            if(response.body.err){
-              
-            }else{
-              if(response.body.ok == 1){
-					   }else{
-					   }
-        }       
-      }, (response) => {
-      });
+      if(this.$parent.$data.cout > 0){
+          this.$parent.$data.cout = --this.$parent.$data.cout
+      }
+      
     }
   }
 }
