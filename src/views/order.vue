@@ -1,7 +1,14 @@
 <template>
 <div>
 <el-card class="box-card">
-    <h3>订单列表</h3>
+			<el-form :inline="true" :model="filters">
+				<el-form-item>
+					<el-input v-model="filters.name" placeholder="姓名"></el-input>
+				</el-form-item>
+				<el-form-item>
+					<el-button type="primary" v-on:click="getUsers">查询</el-button>
+				</el-form-item>
+			</el-form>
     <el-row type="flex" align="middle" :gutter="20" style="padding:20px 0;">
       <el-table :data="tableData" border style="width: 100%">
       <el-table-column fixed prop="createdAt" :formatter="createdateformatter" label="下单日期" width="150">
@@ -150,10 +157,12 @@ export default {
       getUsers(){
           this.$data.listLoading = true
           var postData = {
-              offset:(this.$data.curPage-1)*this.$data.pageSize,
-              limit:this.$data.curPage*this.$data.pageSize
+              offset:0,
+              limit:this.$data.pageSize,
+              v:this.$data.filters.name,
+              k:"exp_no"
           }
-          this.$http.post(g.debugUrl+"getOrders",postData).then((res)=>{
+          this.$http.post(g.debugUrl+"getOrdersBylike",postData).then((res)=>{
               this.$data.total = res.body.d.count;
               this.$data.tableData = res.body.d.rows;  
               this.$data.listLoading = false    
