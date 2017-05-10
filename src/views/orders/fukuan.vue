@@ -61,8 +61,8 @@
 </template>
 
 <script>
-import api from "../util/api.js";
-import g from "../globals/global.js";
+import api from "../../util/api.js";
+import g from "../../globals/global.js";
 export default {
   data () {
     return {
@@ -142,12 +142,12 @@ export default {
           this.$data.listLoading = true
           var postData = {
               offset:(this.$data.curPage-1)*this.$data.pageSize,
-              limit:this.$data.curPage*this.$data.pageSize
+              limit:this.$data.curPage*this.$data.pageSize,
+              status:1
           }
           this.$http.post(g.debugUrl+"getOrders",postData).then((res)=>{
               this.$data.total = res.body.d.count;
               this.$data.tableData = res.body.d.rows;  
-
               this.$data.listLoading = false    
           },
           (res)=>{
@@ -189,11 +189,11 @@ export default {
     },
     
    mounted (){
-      console.log("mounted")
+      console.log("fukuan_mounted")
        this.findByPage()
    },
    created (){
-       console.log("create")
+       console.log("fukuan_create")
    }
 }
 </script>

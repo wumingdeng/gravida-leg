@@ -18,13 +18,13 @@
 		</el-col>
     <main>
         <div class="main-left">
-            <el-menu default-active="2" class="" @open="handleOpen" @close="handleClose" theme="dark">
+            <el-menu default-active="/" theme="dark" :router="true">
               <el-submenu index="1">
                 <template slot="title">订单管理</template>
-                  <el-menu-item index="1-1">未付款<div v-if="s1_cout>0" class="notice">{{s1_cout}}</div></el-menu-item>
-                  <el-menu-item index="1-2">已付款<div v-if="s2_cout>0" class="notice">{{s2_cout}}</div></el-menu-item>
-                  <el-menu-item index="1-3">未发货<div v-if="s3_cout>0" class="notice">{{s3_cout}}</div></el-menu-item>
-                  <el-menu-item index="1-4">已发货<div v-if="s4_cout>0" class="notice">{{s4_cout}}</div></el-menu-item>
+                  <el-menu-item index="/">未付款<div v-if="s1_cout>0" class="notice">{{s1_cout}}</div></el-menu-item>
+                  <el-menu-item index="/fukuan">已付款<div v-if="s2_cout>0" class="notice">{{s2_cout}}</div></el-menu-item>
+                  <el-menu-item index="/weishouhuo">未发货<div v-if="s3_cout>0" class="notice">{{s3_cout}}</div></el-menu-item>
+                  <el-menu-item index="/shouhuo">已发货<div v-if="s4_cout>0" class="notice">{{s4_cout}}</div></el-menu-item>
               </el-submenu>
               <el-menu-item index="2">导航二</el-menu-item>
               <el-menu-item index="3">导航三</el-menu-item>
@@ -76,6 +76,7 @@ export default {
         }
     },
     mounted() {
+        console.log("home")
         var user = {
             name:"fizzo",
             avatar:"https://raw.githubusercontent.com/taylorchen709/markdown-images/master/vueadmin/user.png",
@@ -96,11 +97,11 @@ export default {
 <style lang="css" rel="stylesheet/css">
   
   /* 主内容区 */
-main{display: -ms-flexbox;display: flex;  min-height: 800px;  border: solid 10px #E9ECF1;  background-color: #FCFCFC;
+main{display: -ms-flexbox;display: flex;  min-height: 800px;  border: solid 5px #E9ECF1;  background-color: #FCFCFC;
 }
-main .main-left{text-align: center;-ms-flex: 0 0 200px;flex: 0 0 200px;
+main .main-left{text-align: center;-ms-flex: 0 0 200px;flex: 0 0 200px;padding: 5px 5px;
 }
-main .main-right{-ms-flex:1;flex:1; background-color: #fff; padding: 50px 70px;
+main .main-right{-ms-flex:1;flex:1; background-color: #fff; padding: 5px 5px;
 }
 
     .header {

@@ -38,14 +38,20 @@
 import login from '../views/login.vue';
 import order from '../views/order.vue';
 import home from '../views/home.vue';
+import fukuan from '../views/orders/fukuan.vue';
+import shouhuo from '../views/orders/shouhuo.vue';
+import weifukuan from '../views/orders/weifukuan.vue';
+import weishouhuo from '../views/orders/weishouhuo.vue';
 
 export default [
   {
     path: '/',
     component: home,
     children: [
-        { path: '/', component: order,name:""},
-        { path: '/home:s', component: order,name:""},
+        { path: '/', component: weifukuan,name:"weifukuan"},
+        { path: '/fukuan', component: fukuan,name:"fukuan"},
+        { path: '/shouhuo', component: shouhuo,name:"shouhuo"},
+        { path: '/weishouhuo', component: weishouhuo,name:"weishouhuo"},
     ]
   }
 ];
