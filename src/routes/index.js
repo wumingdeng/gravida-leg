@@ -35,12 +35,17 @@
 // export default routes;
 
 // Pages
-import home from '../views/login.vue';
+import login from '../views/login.vue';
 import order from '../views/order.vue';
+import home from '../views/home.vue';
 
 export default [
   {
     path: '/',
-    component: order
+    component: home,
+    children: [
+        { path: '/', component: order,name:""},
+        { path: '/home:s', component: order,name:""},
+    ]
   }
 ];
