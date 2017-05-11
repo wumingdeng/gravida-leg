@@ -1,18 +1,18 @@
 <template>
 <div>
-<el-card class="box-card">
-    <strong class="title">付款列表</strong>
-    <el-form :inline="true" :model="filters">
-        <el-form-item>
-            <el-input v-model="filters.name" placeholder="姓名"></el-input>
-        </el-form-item>
-        <el-form-item>
-            <el-button type="primary" v-on:click="getUsers">查询</el-button>
-        </el-form-item>
-    </el-form>
+    <div class="toolbar">
+        <el-form :inline="true" :model="filters">
+            <el-form-item>
+                <el-input v-model="filters.name" placeholder="姓名"></el-input>
+            </el-form-item>
+            <el-form-item>
+                <el-button type="primary" v-on:click="getUsers">查询</el-button>
+            </el-form-item>
+        </el-form>
+    </div>
     <el-row type="flex" align="middle" :gutter="20">
       <el-table :data="tableData" style="width: 100%">
-      <el-table-column fixed prop="createdAt" :formatter="createdateformatter" label="下单日期" style="width: 15%">
+      <el-table-column prop="createdAt" :formatter="createdateformatter" label="下单日期" style="width: 15%">
       </el-table-column>
       <el-table-column prop="id" label="订单号" style="width: 10%">
       </el-table-column>
@@ -28,7 +28,7 @@
       </el-table-column>
       <el-table-column prop="updatedAt" :formatter="updateformatter" label="最新修改时间" style="width: 15%">
       </el-table-column>
-      <el-table-column label="操作" fixed='right'  style="width: 5%">
+      <el-table-column label="操作"  style="width: 5%">
         <template scope="scope">
           <el-button
             v-if="scope.row.status == 1" 
@@ -57,7 +57,6 @@
           @current-change="handle_setCurPage">
         </el-pagination>
       </el-row>
-    </el-card>
 </div>
 </template>
 
@@ -143,7 +142,7 @@ export default {
           this.$data.listLoading = true
           var postData = {
               offset:(this.$data.curPage-1)*this.$data.pageSize,
-              limit:this.$data.curPage*this.$data.pageSize,
+              limit:this.$data.pageSize,
               status:1
           }
           this.$http.post(g.debugUrl+"getOrders",postData).then((res)=>{

@@ -114,7 +114,7 @@ export default {
       },
       open2(idx,row){
           var no = row.patient_no
-          this.$router.push({ name: 'report', params: { no: no }})
+          this.$router.push({ name: '客人报告', params: { no: no }})
       }
     },
     

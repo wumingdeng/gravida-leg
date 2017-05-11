@@ -32,6 +32,14 @@
             </aside>
             <section class="content-container">
                 <div class="grid-content bg-purple-light">
+                    <el-col :span="24" class="breadcrumb-container">
+						<strong class="title">{{$route.name}}</strong>
+						<el-breadcrumb separator="/" class="breadcrumb-inner">
+							<el-breadcrumb-item v-for="item in $route.matched" :key="item.path">
+								{{ item.name }}
+							</el-breadcrumb-item>
+						</el-breadcrumb>
+					</el-col>
                     <el-col :span="24" class="content-wrapper">
                         <transition name="fade" mode="out-in">
                             <router-view></router-view>
@@ -182,12 +190,12 @@ main .main-right{-ms-flex:1;flex:1; background-color: #fff; padding: 5px 5px;
     height: 100%;
 }
 .main aside .collapsed{
-width:60px;
+    width:60px;
 }
-.main aside .collapsed.item{
+.main aside .collapsed .item{
     position: relative;
 }
-.main aside .collapsed.submenu{
+.main aside .collapsed .submenu{
     position:absolute;
     top:0px;
     left:60px;

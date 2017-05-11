@@ -50,12 +50,12 @@ export default [
     path: '/',
     component: home,
     children: [
-        { path: '/', component: weifukuan,name:"weifukuan"},
-        { path: '/fukuan', component: fukuan,name:"fukuan"},
-        { path: '/shouhuo', component: shouhuo,name:"shouhuo"},
-        { path: '/weishouhuo', component: weishouhuo,name:"weishouhuo"},
-        { path: '/visit', component: visit,name:"visit"},
-        { path: '/report/:no', component: report,name:"report"},
+        { path: '/', component: weifukuan,name:"未付款"},
+        { path: '/fukuan', component: fukuan,name:"已付款"},
+        { path: '/shouhuo', component: shouhuo,name:"已收货"},
+        { path: '/weishouhuo', component: weishouhuo,name:"未收货"},
+        { path: '/visit', component: visit,name:"就诊列表"},
+        { path: '/report/:no', component: report,name:"客人报告"},
     ]
   }
 ];
