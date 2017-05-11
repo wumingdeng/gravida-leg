@@ -10,18 +10,8 @@
 <script>
 export default {
   data () {
-    return {
-     cout:10
-    }
-  },
-  methods: {
-      handleOpen(key, keyPath) {
-        console.log(key, keyPath);
-      },
-      handleClose(key, keyPath) {
-        console.log(key, keyPath);
-      }
-    }
+    return {}
+  }
 }
 </script>
 
@@ -39,11 +29,13 @@ export default {
     right:60px;
     top:5px;
   }
-  /* 主内容区 */
-main{display: -ms-flexbox;display: flex;  min-height: 800px;  border: solid 10px #E9ECF1;  background-color: #FCFCFC;
-}
-main .main-left{text-align: center;-ms-flex: 0 0 200px;flex: 0 0 200px;
-}
-main .main-right{-ms-flex:1;flex:1; background-color: #fff; padding: 50px 70px;
-}
+  .toolbar {
+    background: #f2f2f2;
+    padding: 20px;
+    margin: 10px -10px;
+    padding-bottom: 0px;
+  }
+  .title {
+    margin: 10px -10px;
+  }
 </style>

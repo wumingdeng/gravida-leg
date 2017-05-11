@@ -9,8 +9,8 @@
 					<el-button type="primary" v-on:click="getUsers">查询</el-button>
 				</el-form-item>
 			</el-form>
-    <el-row type="flex" align="middle" :gutter="20" style="padding:20px 0;">
-      <el-table :data="tableData" border style="width: 100%">
+    <el-row type="flex" align="middle" :gutter="20">
+      <el-table :data="tableData" style="width: 100%">
       <el-table-column fixed prop="createdAt" :formatter="createdateformatter" label="下单日期" style="width: 15%">
       </el-table-column>
       <el-table-column prop="id" label="订单号" style="width: 10%">

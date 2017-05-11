@@ -1,16 +1,19 @@
 <template>
 <div>
 <el-card class="box-card">
-			<el-form :inline="true" :model="filters">
-				<el-form-item>
-					<el-input v-model="filters.name" placeholder="姓名"></el-input>
-				</el-form-item>
-				<el-form-item>
-					<el-button type="primary" v-on:click="getUsers">查询</el-button>
-				</el-form-item>
-			</el-form>
-    <el-row type="flex" align="middle" :gutter="20" style="padding:20px 0;">
-      <el-table :data="tableData" border style="width: 100%">
+    <strong class="title">未付款列表</strong>
+    <div class="toolbar">
+    <el-form :inline="true" :model="filters">
+        <el-form-item>
+            <el-input v-model="filters.name" placeholder="姓名"></el-input>
+        </el-form-item>
+        <el-form-item>
+            <el-button type="primary" v-on:click="getUsers">查询</el-button>
+        </el-form-item>
+    </el-form>
+    </div>
+    <el-row type="flex" align="middle" :gutter="20">
+      <el-table :data="tableData" style="width: 100%">
       <el-table-column fixed prop="createdAt" :formatter="createdateformatter" label="下单日期" style="width: 15%">
       </el-table-column>
       <el-table-column prop="id" label="订单号" style="width: 10%">

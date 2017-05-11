@@ -42,6 +42,8 @@ import fukuan from '../views/orders/fukuan.vue';
 import shouhuo from '../views/orders/shouhuo.vue';
 import weifukuan from '../views/orders/weifukuan.vue';
 import weishouhuo from '../views/orders/weishouhuo.vue';
+import visit from '../views/visits/visits.vue';
+import report from '../views/visits/report.vue';
 
 export default [
   {
@@ -52,6 +54,8 @@ export default [
         { path: '/fukuan', component: fukuan,name:"fukuan"},
         { path: '/shouhuo', component: shouhuo,name:"shouhuo"},
         { path: '/weishouhuo', component: weishouhuo,name:"weishouhuo"},
+        { path: '/visit', component: visit,name:"visit"},
+        { path: '/report/:no', component: report,name:"report"},
     ]
   }
 ];
