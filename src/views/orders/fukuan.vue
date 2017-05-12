@@ -189,7 +189,7 @@ export default {
     },
     
    mounted (){
-      console.log("fukuan_mounted")
+       console.log("fukuan_mounted")
        this.findByPage()
    },
    created (){

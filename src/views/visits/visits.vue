@@ -1,6 +1,6 @@
 <template>
 <div>
-<el-card class="box-card">
+<div class="toolbar">
 			<el-form :inline="true" :model="filters">
 				<el-form-item>
 					<el-input v-model="filters.name" placeholder="姓名"></el-input>
@@ -9,9 +9,10 @@
 					<el-button type="primary" v-on:click="getUsers">查询</el-button>
 				</el-form-item>
 			</el-form>
+</div>
     <el-row type="flex" align="middle" :gutter="20" style="padding:20px 0;">
       <el-table :data="tableData" style="width: 100%">
-      <el-table-column fixed prop="createdAt" :formatter="createdateformatter" label="就诊时间" style="width: 15%">
+      <el-table-column prop="createdAt" :formatter="createdateformatter" label="就诊时间" style="width: 15%">
       </el-table-column>
       <el-table-column prop="id" label="就诊号" style="width: 15%">
       </el-table-column>
@@ -21,7 +22,7 @@
       </el-table-column>
       <el-table-column prop="content" label="内容" style="width: 50%">
       </el-table-column>
-      <el-table-column label="操作" fixed='right'  style="width: 5%">
+      <el-table-column label="操作" style="width: 5%">
         <template scope="scope">
           <el-button
             size="small"
@@ -41,7 +42,6 @@
           @current-change="handle_setCurPage">
         </el-pagination>
       </el-row>
-    </el-card>
 </div>
 </template>
 

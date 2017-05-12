@@ -1,7 +1,7 @@
 <template>
 <div>
     <el-table :data="reportInfo" style="width: 100%">
-      <el-table-column fixed prop="createdAt" :formatter="createdateformatter" label="就诊时间" style="width: 15%">
+      <el-table-column prop="createdAt" :formatter="createdateformatter" label="就诊时间" style="width: 15%">
       </el-table-column>
       <el-table-column prop="id" label="报告号" style="width: 15%">
       </el-table-column>
