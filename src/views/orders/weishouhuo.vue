@@ -1,17 +1,17 @@
 <template>
-<div>
+<section>
   <div class="toolbar">
-			<el-form :inline="true" :model="filters">
-				<el-form-item>
-					<el-input v-model="filters.name" placeholder="姓名"></el-input>
-				</el-form-item>
-				<el-form-item>
-					<el-button type="primary" v-on:click="getUsers">查询</el-button>
-				</el-form-item>
-			</el-form>
-  </div>
+        <el-form :inline="true" :model="filters">
+            <el-form-item>
+                <el-input v-model="filters.name" placeholder="姓名"></el-input>
+            </el-form-item>
+            <el-form-item>
+                <el-button type="primary" v-on:click="getUsers">查询</el-button>
+            </el-form-item>
+        </el-form>
+    </div>
     <el-row type="flex" align="middle" :gutter="20">
-      <el-table :data="tableData" style="width: 100%">
+      <el-table v-loading="listLoading" :data="tableData" style="width: 100%">
       <el-table-column prop="createdAt" :formatter="createdateformatter" label="下单日期" style="width: 15%">
       </el-table-column>
       <el-table-column prop="id" label="订单号" style="width: 10%">
@@ -57,7 +57,7 @@
           @current-change="handle_setCurPage">
         </el-pagination>
       </el-row>
-</div>
+</section>
 </template>
 
 <script>

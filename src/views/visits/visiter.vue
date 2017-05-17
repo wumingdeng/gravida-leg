@@ -1,6 +1,6 @@
 <template>
-<div>
-    <el-table :data="reportInfo" style="width: 100%">
+<el-row type="flex" align="middle" :gutter="20">
+    <el-table v-loading="listLoading" :data="reportInfo" style="width: 100%">
       <el-table-column prop="createdAt" :formatter="createdateformatter" label="就诊时间" style="width: 15%">
       </el-table-column>
       <el-table-column prop="id" label="报告号" style="width: 15%">
@@ -16,7 +16,7 @@
       <el-table-column prop="pro_style" :formatter="proFormatter" label="建议鞋型" style="width: 50%">
       </el-table-column>
     </el-table>
-</div>
+</el-row>
 </template>
 
 <script>

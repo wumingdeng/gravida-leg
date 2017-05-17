@@ -61,5 +61,10 @@ export default [
         { path: '/visiter/:no', component: visiter,name:"客人信息"},
         { path: '/user', component: user,name:"用户管理"},
     ]
+  },
+  {
+    path: '/login',
+    component: login,
+    name:"login"
   }
 ];

@@ -11,7 +11,7 @@
         </el-form>
     </div>
     <el-row type="flex" align="middle" :gutter="20">
-      <el-table :data="tableData" style="width: 100%">
+      <el-table v-loading="listLoading" :data="tableData" style="width: 100%">
       <el-table-column prop="createdAt" :formatter="createdateformatter" label="下单日期" style="width: 15%">
       </el-table-column>
       <el-table-column prop="id" label="订单号" style="width: 10%">

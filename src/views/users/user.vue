@@ -14,7 +14,7 @@
         </el-form>
     </div>
     <el-row type="flex" align="middle" :gutter="20">
-      <el-table :data="tableData" style="width: 100%">
+      <el-table v-loading="listLoading" :data="tableData" style="width: 100%">
       <el-table-column prop="createdAt" :formatter="createdateformatter" label="创建日期" style="width: 15%">
       </el-table-column>
       <el-table-column prop="username" label="用户名" style="width: 10%">
@@ -295,7 +295,7 @@ export default {
               limit:this.$data.pageSize,
               status:1
           }
-          this.$http.post(g.debugUrl+"getAdmins",postData).then((res)=>{
+          this.$http.post(g.debugUrl+"getAdmins",postData,{credentials:true}).then((res)=>{
               this.$data.total = res.body.d.count;
               this.$data.tableData = res.body.d.rows;  
               this.$data.listLoading = false    

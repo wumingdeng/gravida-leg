@@ -31,11 +31,11 @@ export default {
   }
   .toolbar {
     background: #f2f2f2;
-    padding: 20px;
+    padding: 10px;
     margin: 10px -10px;
     padding-bottom: 0px;
   }
-  .title {
-    margin: 10px -10px;
-  }
+  .toolbar .el-form-item {
+		margin-bottom: 10px;
+	}
 </style>

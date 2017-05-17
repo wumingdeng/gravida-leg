@@ -1,17 +1,17 @@
 <template>
-<div>
-<div class="toolbar">
-			<el-form :inline="true" :model="filters">
-				<el-form-item>
-					<el-input v-model="filters.name" placeholder="姓名"></el-input>
-				</el-form-item>
-				<el-form-item>
-					<el-button type="primary" v-on:click="getUsers">查询</el-button>
-				</el-form-item>
-			</el-form>
-</div>
-    <el-row type="flex" align="middle" :gutter="20" style="padding:20px 0;">
-      <el-table :data="tableData" style="width: 100%">
+<section>
+    <div class="toolbar">
+        <el-form :inline="true" :model="filters">
+            <el-form-item>
+                <el-input v-model="filters.name" placeholder="姓名"></el-input>
+            </el-form-item>
+            <el-form-item>
+                <el-button type="primary" v-on:click="getUsers">查询</el-button>
+            </el-form-item>
+        </el-form>
+    </div>
+    <el-row type="flex" align="middle" :gutter="20">
+      <el-table v-loading="listLoading" :data="tableData" style="width: 100%" @row-click="onRowClick">
       <el-table-column prop="createdAt" :formatter="createdateformatter" label="就诊时间" style="width: 15%">
       </el-table-column>
       <el-table-column prop="id" label="就诊号" style="width: 15%">
@@ -42,7 +42,7 @@
           @current-change="handle_setCurPage">
         </el-pagination>
       </el-row>
-</div>
+</section>
 </template>
 
 <script>
@@ -63,6 +63,10 @@ export default {
     }
   },
   methods: {
+      onRowClick(row, event, column){
+        var no = row.patient_no
+        this.$router.push({ name: '客人信息', params: { no: no }})
+      },
       createdateformatter(row, column){
           var value = row.createdAt
           var data = value.split('T')[0]
