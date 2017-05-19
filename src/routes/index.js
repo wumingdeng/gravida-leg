@@ -46,7 +46,7 @@ import visit from '../views/visits/visits.vue';
 import visiter from '../views/visits/visiter.vue';
 import report from '../views/visits/report.vue';
 import user from '../views/users/user.vue';
-
+import test from '../views/test.vue';
 export default [
   {
     path: '/',
@@ -66,5 +66,10 @@ export default [
     path: '/login',
     component: login,
     name:"login"
+  },
+   {
+    path: '/test',
+    component: test,
+    name:"test"
   }
 ];

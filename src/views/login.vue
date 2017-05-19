@@ -46,7 +46,7 @@
           if (valid) {
             this.logining = true;
             var loginParams = { username: this.ruleForm2.account, password: this.ruleForm2.checkPass };
-            this.$http.post(g.debugUrl+"login",loginParams,{credentials:true}).then((res)=>{
+            this.$http.post(g.debugUrl+"login",loginParams).then((res)=>{
               if(res.body.d){
                 console.log(res.body.sid)
                 setCookie('connect.sid',res.body.sid)

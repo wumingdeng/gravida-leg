@@ -73,7 +73,16 @@ export default {
                 //type: 'warning'
             }).then(() => {
                 sessionStorage.removeItem('user');
-                _this.$router.push('/login');
+                _this.$http.get(g.debugUrl+"signOut").then((res)=>{
+                    console.log("dkdkkdkdkjk")
+                    if(res.body.d){
+                        // _this.$router.push('/login');
+                    } else{
+                        console.log("dkdkkdkdkjk")
+                    }   
+                },
+                (res)=>{
+                })
             }).catch(() => {
 
             });
