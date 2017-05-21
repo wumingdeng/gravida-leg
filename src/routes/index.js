@@ -47,7 +47,9 @@ import visiter from '../views/visits/visiter.vue';
 import report from '../views/visits/report.vue';
 import user from '../views/users/user.vue';
 import test from '../views/test.vue';
+import NotFound from '../views/NotFound.vue';
 export default [
+   {path: '*', component: NotFound, name: 'notfound'},
   {
     path: '/',
     component: home,

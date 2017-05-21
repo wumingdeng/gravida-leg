@@ -26,7 +26,6 @@
                     <el-menu-item index="/weishouhuo">未发货<div v-if="s3_cout>0" class="notice">{{s3_cout}}</div></el-menu-item>
                     <el-menu-item index="/shouhuo">已发货<div v-if="s4_cout>0" class="notice">{{s4_cout}}</div></el-menu-item>
                 </el-submenu>
-                <el-menu-item index="/visit">就诊管理</el-menu-item>
                 <el-menu-item index="/user">用户管理</el-menu-item>
                 </el-menu>
             </aside>
@@ -110,7 +109,6 @@ export default {
             this.sysUserName = user.name || '';
             this.sysUserAvatar = user.avatar || '';
         }
-
     }
 }
 </script>
