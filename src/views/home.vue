@@ -27,6 +27,7 @@
                     <el-menu-item index="/shouhuo">已发货<div v-if="s4_cout>0" class="notice">{{s4_cout}}</div></el-menu-item>
                 </el-submenu>
                 <el-menu-item index="/user">用户管理</el-menu-item>
+                <el-menu-item index="/hospital">医院管理</el-menu-item>
                 </el-menu>
             </aside>
             <section class="content-container">
