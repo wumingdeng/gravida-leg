@@ -24,7 +24,7 @@ export default [
     path: '/',
     component: home,
     children: [
-        { path: '/', component: order,name:"未付款记录"},
+        { path: '/', component: weifukuan,name:"未付款记录"},
         { path: '/fukuan', component: fukuan,name:"已付款记录"},
         { path: '/shouhuo', component: shouhuo,name:"已收货记录"},
         { path: '/weishouhuo', component: weishouhuo,name:"未收货记录"},

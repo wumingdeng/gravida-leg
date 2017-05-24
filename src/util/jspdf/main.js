@@ -24,7 +24,6 @@ import './plugins/xmp_metadata';
 // import './node_modules/adler32cs/adler32cs.js';
 import './libs/css_colors.js';
 import './libs/deflate.js';
-import './libs/html2canvas/dist/html2canvas.js';
 import './libs/png_support/png.js';
 import './libs/png_support/zlib.js';
 import './libs/polyfill.js';
