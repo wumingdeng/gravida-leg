@@ -1,7 +1,7 @@
 <template>
 
   <el-form :model="ruleForm2" :rules="rules2" ref="ruleForm2" label-position="left" label-width="0px" class="demo-ruleForm login-container">
-    <h3 class="title">系统登录:{{gsStr}}</h3>
+    <h3 class="title">系统登录</h3>
     <el-form-item prop="account">
       <el-input type="text" v-model="ruleForm2.account" auto-complete="off" placeholder="账号"></el-input>
     </el-form-item>
@@ -22,11 +22,10 @@
   export default {
     data() {
       return {
-        gsStr:"第鬼医院",
         logining: false,
         ruleForm2: {
-          account: 'admin',
-          checkPass: '123456'
+          account: '',
+          checkPass: ''
         },
         rules2: {
           account: [
@@ -46,20 +45,30 @@
         var _this = this;
         this.$refs.ruleForm2.validate((valid) => {
           if (valid) {
-            this.logining = true;
+            this.$data.logining = true;
             var loginParams = { username: this.ruleForm2.account, password: this.ruleForm2.checkPass };
             this.$http.post(g.debugUrl+"login",loginParams).then((res)=>{
-              if(res.body.d){
-                console.log(res.body.sid)
-                setCookie('connect.sid',res.body.sid)
+              if(res.body.ok == 1){
+                var user = res.body.d
+                g.login = true
+                var user = {
+                    username:user.username,
+                    avatar:"https://raw.githubusercontent.com/taylorchen709/markdown-images/master/vueadmin/user.png",
+                    familyname:user.familyname,
+                    weight:user.weight,
+                    doctor_no:"1001"
+                }
+                setCookie('user', JSON.stringify(user));
                 this.$router.push({name:'未付款记录'})
-              } else{
-                  console.log("dkdkkdkdkjk")
+              } else if(res.body.ok == 0){
+                  this.$alert('登陆失败', '警告', {
+                  confirmButtonText: '确定'
+                });
               }   
-              this.$data.listLoading = false          
+              this.$data.logining = false          
           },
           (res)=>{
-              this.$data.listLoading = false      
+              this.$data.logining = false      
           })
           } else {
             console.log('error submit!!');
@@ -69,24 +78,14 @@
       }
     },
     mounted (){
-      var gs = this.$route.params.gs
-      var gsStr = this.$data.gsStr
-      console.log("什么医院："+gs)
-      switch(gs){
-        case "1":
-          this.$data.gsStr = "第一医院";
-          break;
-        case "2":
-          this.$data.gsStr= "第二医院";
-          break;
-        case "3":
-          this.$data.gsStr="yukiko 医院";
-          break;
-        default:
-          this.$data.gsStr="fizzo 医院";
-          break;
+      var user = getCookie('user');
+      if (user) {
+          user = JSON.parse(user);
+          if(user){
+            this.ruleForm2.account = user.username || '';
+            this.ruleForm2.checkPass = user.password || '';
+          }
       }
-
     }
   }
 

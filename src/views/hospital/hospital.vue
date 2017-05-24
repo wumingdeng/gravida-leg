@@ -17,23 +17,16 @@
       <el-table v-loading="listLoading" :data="tableData" style="width: 100%">
       <el-table-column prop="createdAt" :formatter="createdateformatter" label="创建日期" style="width: 15%">
       </el-table-column>
-      <el-table-column prop="username" label="用户名" style="width: 10%">
+      <el-table-column prop="updatedAt" :formatter="updateformatter" label="修改时间" style="width: 15%">
       </el-table-column>
-      <el-table-column prop="password" label="密码" style="width: 10%">
+      <el-table-column prop="name" label="医院名" style="width: 10%">
       </el-table-column>
-      <el-table-column prop="weight" :formatter="statusFor" label="权限" style="width: 5%">
-      </el-table-column>
-      <el-table-column prop="familyname" label="真实姓名" style="width: 10%">
-      </el-table-column>
-    
       <el-table-column label="操作">
         <template scope="scope">
           <el-button
-            v-if="scope.row.weight > 0" 
             size="small"
             @click="onEdit(scope.$index, scope.row)">编辑</el-button>
           <el-button
-            v-if="scope.row.weight > 1" 
             size="small"
             @click="handleDelete(scope.$index, scope.row)">删除</el-button>
         </template>
@@ -54,22 +47,21 @@
 
       <!--编辑界面-->
 		<el-dialog title="编辑" v-model="editFormVisible" :close-on-click-modal="false">
-			<el-form :model="editForm" label-width="80px" :rules="editFormRules" ref="editForm">
-				<el-form-item label="真实姓名" prop="familyname">
+			<el-form :model="editForm" label-width="90px" :rules="editFormRules" ref="editForm">
+				<el-form-item label="医院名称" prop="name">
+					<el-input v-model="editForm.name"></el-input>
+				</el-form-item>
+                <el-form-item label="访问地址" prop="add">
+					<el-input v-model="editForm.add"></el-input>
+				</el-form-item>
+                <el-form-item label="管理员姓名" prop="familyname">
 					<el-input v-model="editForm.familyname"></el-input>
 				</el-form-item>
-				<el-form-item label="用户名">
+                <el-form-item label="管理员帐号" prop="username">
 					<el-input v-model="editForm.username"></el-input>
 				</el-form-item>
-				<el-form-item label="密码">
+                <el-form-item label="管理员密码" prop="password">
 					<el-input v-model="editForm.password"></el-input>
-				</el-form-item>
-				<el-form-item label="权限" prop='weight'>
-                    <el-checkbox-group v-model="editForm.weight">
-						<el-checkbox label="0" name='weight'>订单管理</el-checkbox>
-						<el-checkbox label="1" name='weight'>医院管理</el-checkbox>
-                        <el-checkbox label="2" name='weight'>用户管理</el-checkbox>
-					</el-checkbox-group>
 				</el-form-item>
 			</el-form>
 			<div slot="footer" class="dialog-footer">
@@ -79,23 +71,22 @@
 		</el-dialog>
 
 		<!--新增界面-->
-		<el-dialog title="新增" v-model="addFormVisible" :close-on-click-modal="false">
-			<el-form :model="addForm" label-width="80px" :rules="addFormRules" ref="addForm">
-				<el-form-item label="真实姓名" prop="familyname">
+		<el-dialog title="新增医院" v-model="addFormVisible" :close-on-click-modal="false">
+			<el-form :model="addForm" label-width="90px" :rules="addFormRules" ref="addForm">
+				<el-form-item label="医院名称" prop="name">
+					<el-input v-model="addForm.name"></el-input>
+				</el-form-item>
+                <el-form-item label="访问地址" prop="add">
+					<el-input v-model="addForm.add"></el-input>
+				</el-form-item>
+                <el-form-item label="管理员姓名" prop="familyname">
 					<el-input v-model="addForm.familyname"></el-input>
 				</el-form-item>
-				<el-form-item label="用户名" prop="username">
+                <el-form-item label="管理员帐号" prop="username">
 					<el-input v-model="addForm.username"></el-input>
 				</el-form-item>
-				<el-form-item label="密码" prop="password">
+                <el-form-item label="管理员密码" prop="password">
 					<el-input v-model="addForm.password"></el-input>
-				</el-form-item>
-				<el-form-item label="权限" prop='weight'>
-                    <el-checkbox-group v-model="addForm.weight">
-						<el-checkbox label="0" name='weight'>订单管理</el-checkbox>
-						<el-checkbox label="1" name='weight'>医院管理</el-checkbox>
-                        <el-checkbox label="2" name='weight'>用户管理</el-checkbox>
-					</el-checkbox-group>
 				</el-form-item>
 			</el-form>
 			<div slot="footer" class="dialog-footer">
@@ -122,50 +113,26 @@ export default {
         editFormVisible:false,
         editLoading: false,
         editFormRules: {
-            familyname: [
-                { required: true, message: '请输入姓名', trigger: 'blur' }
-            ],
-            password: [
-                { required: true, message: '请输入密码', trigger: 'blur' }
-            ],
-            weight: [
-                { type: 'array',required: true, message: '请至少选择一个权限', trigger: 'change' }
-            ],
-            username: [
-                { required: true, message: '请输入用户名', trigger: 'blur' }
+            name: [
+                { required: true, message: '请输入医院名称', trigger: 'blur' }
             ]
         },
         //编辑界面数据
         editForm: {
             id: 0,
-            familyname: '',
-            username: '',
-            weight: [],
-            password: ''
+            name: '',
         },
 
         addFormVisible: false,//新增界面是否显示
         addLoading: false,
         addFormRules: {
-            familyname: [
-                { required: true, message: '请输入真实姓名', trigger: 'blur' }
-            ],
-            password: [
-                { required: true, message: '请输入密码', trigger: 'blur' }
-            ],
-            weight: [
-                { type: 'array',required: true, message: '请至少选择一个权限', trigger: 'change' }
-            ],
-            username: [
-                { required: true, message: '请输入用户名', trigger: 'blur' }
+            name: [
+                { required: true, message: '请输入医院名称', trigger: 'blur' }
             ]
         },
         //新增界面数据
         addForm: {
-            familyname: '',
-            username: '',
-            weight: [],
-            password: ''
+            name: '',
         },
         filters: {
             name: ''
@@ -184,7 +151,7 @@ export default {
                 this.$confirm('确认提交吗？', '提示', {}).then(() => {
                     this.$data.editLoading = true
                     Object.assign(this.curRow, this.$data.editForm);
-                    this.$http.post(g.debugUrl+"saveAdmin",this.$data.editForm).then((res)=>{
+                    this.$http.post(g.debugUrl+"saveHospitals",this.$data.editForm).then((res)=>{
                         if(res.ok == 1){
                             this.$message({
                                 type: 'success',
@@ -205,7 +172,7 @@ export default {
       handleDelete(idx,row){
           this.$confirm('确认删除吗？', '提示', {}).then(() => {
             this.$data.listLoading = true
-            this.$http.post(g.debugUrl+"delAdmin",{id:row.id}).then((res)=>{
+            this.$http.post(g.debugUrl+"delHospitals",{id:row.id}).then((res)=>{
                 if(res.ok == 1){
                     this.$message({
                         type: 'success',
@@ -225,7 +192,7 @@ export default {
             if (valid) {
                 this.$confirm('确认提交吗？', '提示', {}).then(() => {
                     this.addLoading = true;
-                    this.$http.post(g.debugUrl+"saveAdmin",this.$data.addForm).then((res)=>{
+                    this.$http.post(g.debugUrl+"saveHospitals",this.$data.addForm).then((res)=>{
                         console.log(res.body.d)
                         this.addLoading = false;
                         this.$message({
@@ -243,27 +210,9 @@ export default {
     handleAdd: function () {
         this.addFormVisible = true;
         this.$data.addForm = {
-            familyname: '',
-            username: '',
-            weight: [],
-            password: ''
+            name: ''
         };
     },
-      statusFor(row,column){
-           var value = row.weight
-           switch(value){
-              case 0:
-                  return "普通医生";
-              case 1:
-                  return "医师";
-              case 2:
-                  return "主治医生";
-              case 3:
-                  return "主任医师";
-              default:
-                  return ""
-           }
-      },
       createdateformatter(row, column){
           var value = row.createdAt
           if(value){
@@ -297,11 +246,12 @@ export default {
           var postData = {
               offset:(this.$data.curPage-1)*this.$data.pageSize,
               limit:this.$data.pageSize,
-              status:1
           }
-          this.$http.post(g.debugUrl+"getAdmins",postData,{credentials:true}).then((res)=>{
-              this.$data.total = res.body.d.count;
-              this.$data.tableData = res.body.d.rows;  
+          this.$http.post(g.debugUrl+"getHospitals",postData,{credentials:true}).then((res)=>{
+              if(res.body.d){
+                this.$data.total = res.body.d.count;
+                this.$data.tableData = res.body.d.rows;  
+              }
               this.$data.listLoading = false    
           },
           (res)=>{
@@ -316,7 +266,7 @@ export default {
               v:this.$data.filters.name,
           }
           console.log(postData)
-          this.$http.post(g.debugUrl+"getAdminByName",postData).then((res)=>{
+          this.$http.post(g.debugUrl+"getHospitalsByName",postData).then((res)=>{
               this.$data.total = res.body.d.count;
               this.$data.tableData = res.body.d.rows;  
               this.$data.listLoading = false    

@@ -52,6 +52,7 @@
 </template>
 
 <script>
+import {setCookie,getCookie,delCookie} from "../util/cookieUnit.js";
 export default {
     data() {
         return {
@@ -75,10 +76,12 @@ export default {
                 sessionStorage.removeItem('user');
                 _this.$http.get(g.debugUrl+"signOut").then((res)=>{
                     console.log("dkdkkdkdkjk")
-                    if(res.body.d){
-                        // _this.$router.push('/login');
+                    if(res.body.ok == 1){
+                        _this.$router.push('/login');
                     } else{
-                        console.log("dkdkkdkdkjk")
+                        this.$alert('退出失败', '警告', {
+                            confirmButtonText: '确定'
+                        });
                     }   
                 },
                 (res)=>{
@@ -96,18 +99,10 @@ export default {
         }
     },
     mounted() {
-        console.log("home")
-        var user = {
-            name:"fizzo",
-            avatar:"https://raw.githubusercontent.com/taylorchen709/markdown-images/master/vueadmin/user.png",
-            doctor_no:"1001"
-        }
-        sessionStorage.setItem('user', JSON.stringify(user));
-
-        var user = sessionStorage.getItem('user');
+        var user = getCookie('user');
         if (user) {
             user = JSON.parse(user);
-            this.sysUserName = user.name || '';
+            this.sysUserName = user.familyname || '';
             this.sysUserAvatar = user.avatar || '';
         }
     }

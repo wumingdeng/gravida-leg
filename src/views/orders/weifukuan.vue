@@ -12,37 +12,22 @@
     </div>
     <el-row type="flex" align="middle" :gutter="20">
       <el-table v-loading="listLoading" :data="tableData" style="width: 100%">
-       <el-table-column style="width: 50%" label='宝贝' align='center'>
-            <template scope="scope">
-                <el-col :span="15"><img src="https://raw.githubusercontent.com/taylorchen709/markdown-images/master/vueadmin/user.png" class="image">
-                </el-col>
-                <el-col :span="9">
-                    <el-row style='float:left;text-align:left' >香港代购法国老牌珍贵水祛痘神仙水杨酸爽肤水闭口粉刺控油375ml</el-row>
-                    <el-row style='float:left;text-align:left;color:#f00' >颜色分类：多功能枕-卡其色</el-row>
-                    <el-row style='float:left;text-align:left;color:#f00' >数量：1</el-row>
-                </el-col>
-            </template>
-        </el-table-column>
-        <el-table-column style="width: 20%" label='宝贝' align='center'>
-            <template scope="scope">
-                <el-row>
-                    <div style="float:left">{{scope.row.createdAt}}</div>
-                </el-row>
-                <el-row>
-                    <div style="float:left">订单号:{{scope.row.id}}</div>
-                </el-row>
-            </template>
-        </el-table-column>
-        <el-table-column style="width: 20%" label='宝贝' align='center'>
-            <template scope="scope">
-                
-            </template>
-        </el-table-column>
-        <el-table-column style="width: 10%" label='宝贝' align='center'>
-            <template scope="scope">
-                
-            </template>
-        </el-table-column>
+      <el-table-column prop="createdAt" :formatter="createdateformatter" label="下单日期" style="width: 15%">
+      </el-table-column>
+      <el-table-column prop="id" label="订单号" style="width: 10%">
+      </el-table-column>
+      <el-table-column prop="status" :formatter="statusFor" label="状态" style="width: 5%">
+      </el-table-column>
+      <el-table-column prop="pro_no" label="产品号" style="width: 10%">
+      </el-table-column>
+      <el-table-column prop="addr" label="地址" style="width: 15%">
+      </el-table-column>
+      <el-table-column prop="exp_no" label="快递编号" style="width: 15%">
+      </el-table-column>
+      <el-table-column prop="pay_t" label="付款时间" style="width: 15%">
+      </el-table-column>
+      <el-table-column prop="updatedAt" :formatter="updateformatter" label="最新修改时间" style="width: 15%">
+      </el-table-column>
       <el-table-column label="操作" style="width: 5%">
         <template scope="scope">
           <el-button
