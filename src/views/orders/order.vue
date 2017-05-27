@@ -1,9 +1,9 @@
 <template>
-<section>
-  <div class="toolbar">
+<div>
+    <div class="toolbar">
         <el-form :inline="true" :model="filters">
             <el-form-item>
-                <el-input v-model="filters.name" placeholder="姓名"></el-input>
+                <el-input v-model="filters.name" placeholder="订单号/手机号/收货人"></el-input>
             </el-form-item>
             <el-form-item>
                 <el-button type="primary" v-on:click="getUsers">查询</el-button>
@@ -12,22 +12,22 @@
     </div>
     <el-row type="flex" align="middle" :gutter="20">
       <el-table v-loading="listLoading" :data="tableData" style="width: 100%">
-     <el-table-column  width='450' label='商品信息' align='center' >
+      <el-table-column  width='400' label='商品信息' align='center' >
             <template scope="scope">
-                <el-col :span="9" style='padding-top:10px;padding-right:20px'><img src="https://raw.githubusercontent.com/taylorchen709/markdown-images/master/vueadmin/user.png" class="image">
+                <el-col :span="7" style='padding-top:10px;padding-left:0px;padding-right:20px'><img width='100' :src="scope.row.goods[0].icon" class="image">
                 </el-col>
-                <el-col :span="15" style='padding-top:10px'>
-                    <el-row style='text-align:left'>香港代购法国老牌珍贵水祛痘神仙水杨酸爽肤水闭口粉刺控油375ml</el-row>
-                    <el-row style='text-align:left'><div style='float:left;color:#c0c0c0'>颜色：</div><div style='color:#ff0000;float:left'>卡其色</div><div style='float:left;margin-left:20px'>尺码：</div><div style='color:#ff0000;float:left'>41码</div></el-row>
-                    <el-row style='text-align:left'><div style='float:left;color:#c0c0c0'>数量：</div><div style='color:#ff0000'>10000</div></el-row>
+                <el-col :span="17" style='padding-top:10px;padding-left:0px'>
+                    <el-row style='text-align:left'>{{scope.row.goods[0].info}}</el-row>
+                    <el-row style='text-align:left'><div style='float:left;color:#c0c0c0'>颜色：</div><div style='color:#ff0000;float:left'>{{setColorStr(scope.row.goods_color)}}</div><div style='float:left;margin-left:20px'>尺码：</div><div style='color:#ff0000;float:left'>{{scope.row.goods_size}}码</div></el-row>
+                    <el-row style='text-align:left'><div style='float:left;color:#c0c0c0'>数量：</div><div style='color:#ff0000'>{{scope.row.goods_count}}双</div></el-row>
                 </el-col>
             </template>
         </el-table-column>
-        <el-table-column width='150' label='金额' align='center'>
+        <el-table-column label='金额' align='center'>
             <template scope="scope">
-                <el-row>单价:{{1000}}</el-row>
-                <el-row style='color:#ff0000'>优惠:{{299}}</el-row>
-                <el-row>合计:{{1000-299}}</el-row>
+                <el-row>单价:{{scope.row.goods[0].price}}</el-row>
+                <el-row style='color:#ff0000'>优惠:{{scope.row.goods[0].discount}}</el-row>
+                <el-row>合计:{{scope.row.goods[0].price-scope.row.goods[0].discount}}</el-row>
             </template>
         </el-table-column>
         <el-table-column width='200' label='订单信息' align='center'>
@@ -36,19 +36,16 @@
                 <el-row>{{scope.row.createdAt.split('T')[0]}} {{scope.row.createdAt.split('T')[1].substring(0,5)}}</el-row>
             </template>
         </el-table-column>
-        <el-table-column label='联系方式' align='center'>
+        <el-table-column width='300' label='联系方式' align='center'>
             <template scope="scope">
-                <el-row>吴明灯 13616063967</el-row>
-                <el-row>福建省 泉州市 台商投资区 洛阳镇</el-row>
-                <el-row>万安村滨景西路**号</el-row>
+                <el-row>{{scope.row.custom}} {{scope.row.custom_phone}}</el-row>
+                <el-row>{{scope.row.addr_o}}</el-row>
+                <el-row>{{scope.row.addr_a}}</el-row>
             </template>
         </el-table-column>
-     <el-table-column width='180' label='操作' align='center'>
+      <el-table-column label='操作' align='center'>
             <template scope="scope">
-                <el-row v-if="scope.row.status == 0">未付款</el-row>
-                <el-row v-if="scope.row.status == 1">已付款</el-row>
-                <el-row v-if="scope.row.status == 2">未发货</el-row>
-                <el-row v-if="scope.row.status == 3">已发货</el-row>
+                <el-row>{{statusFor(scope.row.status)}}</el-row>
                 <el-row>
                  <el-button
                     v-if="scope.row.status == 1" 
@@ -78,7 +75,7 @@
           @current-change="handle_setCurPage">
         </el-pagination>
       </el-row>
-</section>
+</div>
 </template>
 
 <script>
@@ -92,6 +89,7 @@ export default {
         total:10,
         tableData:[],
         listLoading: false,
+        status:0,
         filters: {
 					name: ''
 				},
@@ -120,8 +118,21 @@ export default {
               this.$data.listLoading = false      
           })
       },
-      statusFor(row,column){
-           var value = row.status
+      setColorStr(color){
+        switch(color){
+              case 0:
+                  return "绿色";
+              case 1:
+                  return "红色";
+              case 2:
+                  return "黄色";
+              case 3:
+                  return "黑色";
+              default:
+                  return "白色"
+           }
+      },
+      statusFor(value){
            switch(value){
               case 0:
                   return "未付款";
@@ -164,12 +175,12 @@ export default {
           var postData = {
               offset:(this.$data.curPage-1)*this.$data.pageSize,
               limit:this.$data.pageSize,
-              status:2
+              status:status
           }
           this.$http.post(g.debugUrl+"getOrders",postData).then((res)=>{
               this.$data.total = res.body.d.count;
+              console.log('asdkfjksdkjfk')
               this.$data.tableData = res.body.d.rows;  
-
               this.$data.listLoading = false    
           },
           (res)=>{
@@ -177,27 +188,43 @@ export default {
           })
       },
       open2(idx,row) {
-        this.$confirm('是否修改该订单的状态, 是否继续?', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
-          this.handleEdit(idx,row)
-          
-        }).catch(() => {
-          this.$message({
-            type: 'info',
-            message: '已取消修改'
-          });          
-        });
+          if(status==2){
+            this.$prompt('请输入快递单号', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+            }).then(({ value }) => {
+                this.$message({
+                    type: 'success',
+                    message: '你输入的快递单号: ' + value
+                });
+            }).catch(() => {
+                this.$message({
+                    type: 'info',
+                    message: '取消输入'
+                });       
+            });
+          }else{
+            this.$confirm('是否修改该订单的状态, 是否继续?', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+            }).then(() => {
+                this.handleEdit(idx,row)
+            }).catch(() => {
+                this.$message({
+                    type: 'info',
+                    message: '已取消修改'
+                });          
+            });
+          }
       },
       getUsers(){
           this.$data.listLoading = true
           var postData = {
               offset:0,
               limit:this.$data.pageSize,
+              status:this.status,
               v:this.$data.filters.name,
-              k:"exp_no"
           }
           this.$http.post(g.debugUrl+"getOrdersBylike",postData).then((res)=>{
               this.$data.total = res.body.d.count;
@@ -205,18 +232,39 @@ export default {
               this.$data.listLoading = false    
           },
           (res)=>{
-              this.$data.listLoading = false   
+              this.$data.listLoading = false
           })
+      },
+      getStatus(path){
+          switch(path){
+              case "/":
+                status = 0
+              break;
+              case "/fukuan":
+                status = 1
+              break;
+              case "/weishouhuo":
+                status = 2
+              break;
+              case "/shouhuo":
+                status = 3
+              break;
+              default:
+                status = 4
+              break
+          }
+          eventBus.$emit("onselectedOrder",status)
       }
     },
-    
    mounted (){
-      console.log("weishouhuo:mounted")
        this.findByPage()
    },
-   created (){
-       console.log("weishouhuo:create")
-   }
+   watch: {
+        '$route' (to, from) {
+            this.getStatus(this.$route.path)
+            this.findByPage()
+        }
+    }
 }
 </script>
 

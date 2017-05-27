@@ -53,30 +53,29 @@
 
 <script>
 import {setCookie,getCookie,delCookie} from "../util/cookieUnit.js";
+import g from "../globals/global.js";
 export default {
     data() {
         return {
-            sysName:'孕妇鞋',
+            sysName:'孕妇鞋销售管理系统',
             collapsed:false,
             sysUserName: '',
             sysUserAvatar: '',
-            s1_cout:1,
-            s2_cout:2,
-            s3_cout:3,
-            s4_cout:4
+            s1_cout:2,
+            s2_cout:6,
+            s3_cout:4,
+            s4_cout:1
         }
     },
     methods: {
         //退出登录
         logout: function () {
             var _this = this;
-            this.$confirm('确认退出吗?', '提示', {
-                //type: 'warning'
-            }).then(() => {
-                sessionStorage.removeItem('user');
+            this.$confirm('确认退出吗?').then(_ => {
                 _this.$http.get(g.debugUrl+"signOut").then((res)=>{
-                    console.log("dkdkkdkdkjk")
                     if(res.body.ok == 1){
+                        console.log("signOut")
+                        setCookie('user', null);
                         _this.$router.push('/login');
                     } else{
                         this.$alert('退出失败', '警告', {
@@ -85,9 +84,12 @@ export default {
                     }   
                 },
                 (res)=>{
+                    console.log(res)
                 })
-            }).catch(() => {
-
+            }).catch(_ => {
+                this.$alert('退出失败', '警告', {
+                    confirmButtonText: '确定'
+                });
             });
         },
         //折叠导航栏
@@ -96,15 +98,36 @@ export default {
         },
         showMenu(i,status){
             this.$refs.menuCollapsed.getElementsByClassName('submenu-hook-'+i)[0].style.display=status?'block':'none';
-        }
+        },
+        
     },
     mounted() {
         var user = getCookie('user');
         if (user) {
             user = JSON.parse(user);
-            this.sysUserName = user.familyname || '';
-            this.sysUserAvatar = user.avatar || '';
+            if(user){
+                this.sysUserName = user.familyname || '';
+                this.sysUserAvatar = user.avatar || '';
+            }
         }
+        eventBus.$on("onselectedOrder",function(status){
+            switch(status){
+              case '0':
+                this.$data.s1_cout--
+              break;
+              case '1':
+                this.$data.s2_cout--
+              break;
+              case '2':
+                this.$data.s3_cout--
+              break;
+              case '3':
+                this.$data.s4_cout--
+              break;
+              default:
+              break
+          }
+        }.bind(this))
     }
 }
 </script>

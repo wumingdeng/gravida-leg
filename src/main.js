@@ -18,9 +18,12 @@ Vue.http.options.credentials = true;
 
 // 创建一个路由对象用于管理页面的路由
 const router = new VueRouter({
+  base:'/gm/',
   mode: 'history',
   routes: routes,
 });
+
+window.eventBus = new Vue({});
 
 new Vue({
   el: '#app',
@@ -28,3 +31,5 @@ new Vue({
   store,
   render: h => h(App)
 })
+
+

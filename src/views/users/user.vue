@@ -29,11 +29,9 @@
       <el-table-column label="操作">
         <template scope="scope">
           <el-button
-            v-if="scope.row.weight > 0" 
             size="small"
             @click="onEdit(scope.$index, scope.row)">编辑</el-button>
           <el-button
-            v-if="scope.row.weight > 1" 
             size="small"
             @click="handleDelete(scope.$index, scope.row)">删除</el-button>
         </template>
@@ -175,6 +173,7 @@ export default {
   methods: {
       onEdit(idx,row){
           this.$data.editFormVisible = true
+          row.weight = row.weight.toString().split(',')
 		  this.$data.editForm = Object.assign({}, row);
           this.curRow = row
       },
@@ -251,17 +250,10 @@ export default {
     },
       statusFor(row,column){
            var value = row.weight
-           switch(value){
-              case 0:
-                  return "普通医生";
-              case 1:
-                  return "医师";
-              case 2:
-                  return "主治医生";
-              case 3:
-                  return "主任医师";
-              default:
-                  return ""
+           if(value.length>1){
+                return "管理员";
+           }else{
+                return "普通用户";
            }
       },
       createdateformatter(row, column){
