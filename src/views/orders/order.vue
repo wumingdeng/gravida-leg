@@ -179,7 +179,6 @@ export default {
           }
           this.$http.post(g.debugUrl+"getOrders",postData).then((res)=>{
               this.$data.total = res.body.d.count;
-              console.log('asdkfjksdkjfk')
               this.$data.tableData = res.body.d.rows;  
               this.$data.listLoading = false    
           },

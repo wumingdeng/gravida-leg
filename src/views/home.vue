@@ -19,15 +19,15 @@
         <el-col :span="24" class="main">
             <aside :class="collapsed?'menu-collapsed':'menu-expanded'">
                 <el-menu default-active="/" theme="dark" :router="true">
-                <el-submenu index="1">
+                <el-submenu index="1" v-if="getWeight('0')">
                     <template slot="title">订单管理</template>
                     <el-menu-item index="/">未付款<div v-if="s1_cout>0" class="notice">{{s1_cout}}</div></el-menu-item>
                     <el-menu-item index="/fukuan">已付款<div v-if="s2_cout>0" class="notice">{{s2_cout}}</div></el-menu-item>
                     <el-menu-item index="/weishouhuo">未发货<div v-if="s3_cout>0" class="notice">{{s3_cout}}</div></el-menu-item>
                     <el-menu-item index="/shouhuo">已发货<div v-if="s4_cout>0" class="notice">{{s4_cout}}</div></el-menu-item>
                 </el-submenu>
-                <el-menu-item index="/user">用户管理</el-menu-item>
-                <el-menu-item index="/hospital">医院管理</el-menu-item>
+                <el-menu-item index="/user" v-if="getWeight('1')">用户管理</el-menu-item>
+                <el-menu-item index="/hospital" v-if="getWeight('2')">医院管理</el-menu-item>
                 </el-menu>
             </aside>
             <section class="content-container">
@@ -64,7 +64,8 @@ export default {
             s1_cout:2,
             s2_cout:6,
             s3_cout:4,
-            s4_cout:1
+            s4_cout:1,
+            weight:[]
         }
     },
     methods: {
@@ -99,7 +100,10 @@ export default {
         showMenu(i,status){
             this.$refs.menuCollapsed.getElementsByClassName('submenu-hook-'+i)[0].style.display=status?'block':'none';
         },
-        
+        getWeight(index){
+            console.log(this.weight.toString())
+            return this.weight.indexOf(index)>-1
+        }
     },
     mounted() {
         var user = getCookie('user');
@@ -108,6 +112,7 @@ export default {
             if(user){
                 this.sysUserName = user.familyname || '';
                 this.sysUserAvatar = user.avatar || '';
+                this.weight = user.weight.split(',')
             }
         }
         eventBus.$on("onselectedOrder",function(status){
