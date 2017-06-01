@@ -87,6 +87,13 @@
             this.ruleForm2.checkPass = user.password || '';
           }
       }
+      this.$http.get(g.debugUrl+"getExpInfo").then((res)=>{
+            if(res.body.ok == 1){
+              
+            } else if(res.body.ok == 0){
+                
+            }   
+        })
     }
   }
 
