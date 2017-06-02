@@ -17,10 +17,11 @@
       <el-table v-loading="listLoading" :data="tableData" style="width: 100%">
       <el-table-column prop="createdAt" :formatter="createdateformatter" label="创建日期" style="width: 15%">
       </el-table-column>
-      <el-table-column prop="updatedAt" :formatter="updateformatter" label="修改时间" style="width: 15%">
-      </el-table-column>
-      <el-table-column prop="name" label="医院名" style="width: 10%">
-      </el-table-column>
+      <el-table-column prop="name" label="医院名" style="width: 10%"></el-table-column>
+      <el-table-column prop="host" label="访问地址" style="width: 10%"></el-table-column>
+      <el-table-column prop="favicon" label="网站图标" style="width: 10%"></el-table-column>
+      <el-table-column prop="username" label="管理员账号" style="width: 10%"></el-table-column>
+      <el-table-column prop="password" label="管理员密码" style="width: 10%"></el-table-column>
       <el-table-column label="操作">
         <template scope="scope">
           <el-button
@@ -51,11 +52,11 @@
 				<el-form-item label="医院名称" prop="name">
 					<el-input v-model="editForm.name"></el-input>
 				</el-form-item>
-                <el-form-item label="访问地址" prop="add">
-					<el-input v-model="editForm.add"></el-input>
+                <el-form-item label="访问地址" prop="host">
+					<el-input v-model="editForm.host"></el-input>
 				</el-form-item>
-                <el-form-item label="管理员姓名" prop="familyname">
-					<el-input v-model="editForm.familyname"></el-input>
+                <el-form-item label="网站图标" prop="favicon">
+					<el-input v-model="addForm.favicon"></el-input>
 				</el-form-item>
                 <el-form-item label="管理员帐号" prop="username">
 					<el-input v-model="editForm.username"></el-input>
@@ -76,11 +77,11 @@
 				<el-form-item label="医院名称" prop="name">
 					<el-input v-model="addForm.name"></el-input>
 				</el-form-item>
-                <el-form-item label="访问地址" prop="add">
-					<el-input v-model="addForm.add"></el-input>
+                <el-form-item label="访问地址" prop="host">
+					<el-input v-model="addForm.host"></el-input>
 				</el-form-item>
-                <el-form-item label="管理员姓名" prop="familyname">
-					<el-input v-model="addForm.familyname"></el-input>
+                <el-form-item label="网站图标" prop="favicon">
+					<el-input v-model="addForm.favicon"></el-input>
 				</el-form-item>
                 <el-form-item label="管理员帐号" prop="username">
 					<el-input v-model="addForm.username"></el-input>
@@ -121,6 +122,10 @@ export default {
         editForm: {
             id: 0,
             name: '',
+            host:'',
+            favicon:'',
+            username:'',
+            password:'',
         },
 
         addFormVisible: false,//新增界面是否显示
@@ -133,6 +138,10 @@ export default {
         //新增界面数据
         addForm: {
             name: '',
+            host:'',
+            favicon:'',
+            username:'',
+            password:'',
         },
         filters: {
             name: ''
