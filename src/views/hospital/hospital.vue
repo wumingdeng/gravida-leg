@@ -19,7 +19,6 @@
       </el-table-column>
       <el-table-column prop="name" label="医院名" style="width: 10%"></el-table-column>
       <el-table-column prop="host" label="访问地址" style="width: 10%"></el-table-column>
-      <el-table-column prop="favicon" label="网站图标" style="width: 10%"></el-table-column>
       <el-table-column prop="username" label="管理员账号" style="width: 10%"></el-table-column>
       <el-table-column prop="password" label="管理员密码" style="width: 10%"></el-table-column>
       <el-table-column label="操作">
@@ -55,9 +54,6 @@
                 <el-form-item label="访问地址" prop="host">
 					<el-input v-model="editForm.host"></el-input>
 				</el-form-item>
-                <el-form-item label="网站图标" prop="favicon">
-					<el-input v-model="addForm.favicon"></el-input>
-				</el-form-item>
                 <el-form-item label="管理员帐号" prop="username">
 					<el-input v-model="editForm.username"></el-input>
 				</el-form-item>
@@ -79,9 +75,6 @@
 				</el-form-item>
                 <el-form-item label="访问地址" prop="host">
 					<el-input v-model="addForm.host"></el-input>
-				</el-form-item>
-                <el-form-item label="网站图标" prop="favicon">
-					<el-input v-model="addForm.favicon"></el-input>
 				</el-form-item>
                 <el-form-item label="管理员帐号" prop="username">
 					<el-input v-model="addForm.username"></el-input>
@@ -123,7 +116,6 @@ export default {
             id: 0,
             name: '',
             host:'',
-            favicon:'',
             username:'',
             password:'',
         },
@@ -139,7 +131,6 @@ export default {
         addForm: {
             name: '',
             host:'',
-            favicon:'',
             username:'',
             password:'',
         },
@@ -203,14 +194,25 @@ export default {
                     this.addLoading = true;
                     this.$http.post(g.debugUrl+"saveHospitals",this.$data.addForm).then((res)=>{
                         console.log(res.body.d)
-                        this.addLoading = false;
-                        this.$message({
-                            message: '提交成功',
-                            type: 'success'
-                        });
-                        this.$refs['addForm'].resetFields();
-                        this.addFormVisible = false;
-                        this.findByPage()
+                        var ok = res.body.ok 
+                        if(ok == 1){
+                            this.addLoading = false;
+                            this.$message({
+                                message: '提交成功',
+                                type: 'success'
+                            });
+                            this.$refs['addForm'].resetFields();
+                            this.addFormVisible = false;
+                            this.findByPage()
+                        }else if(ok == -1){
+                            this.$alert('医院名称已存在', '更新失败', {
+                                confirmButtonText: '确定'
+                            });
+                        }else{
+                            this.$alert('登陆失败', '警告', {
+                                confirmButtonText: '确定'
+                            });
+                        }
                     });
                 });
             }
@@ -219,7 +221,10 @@ export default {
     handleAdd: function () {
         this.addFormVisible = true;
         this.$data.addForm = {
-            name: ''
+            name: '',
+            host:'',
+            username:'',
+            password:''
         };
     },
       createdateformatter(row, column){
