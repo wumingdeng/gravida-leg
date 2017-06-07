@@ -101,11 +101,12 @@ export default {
             this.$refs.menuCollapsed.getElementsByClassName('submenu-hook-'+i)[0].style.display=status?'block':'none';
         },
         getWeight(index){
+            console.log("搞什么")
             console.log(this.weight.toString())
             return this.weight.indexOf(index)>-1
         }
     },
-    mounted() {
+    created() {
         var user = getCookie('user');
         if (user) {
             user = JSON.parse(user);
@@ -115,6 +116,8 @@ export default {
                 this.weight = user.weight.split(',')
             }
         }
+    },
+    mounted() {
         eventBus.$on("onselectedOrder",function(status){
             switch(status){
               case '0':

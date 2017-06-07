@@ -175,9 +175,11 @@ export default {
           this.$data.editFormVisible = true
           row.weight = row.weight.toString().split(',')
 		  this.$data.editForm = Object.assign({}, row);
+          console.log(this.$data.editForm)
           this.curRow = row
       },
       handleEdit:function(){
+          console.log(this.$data.editForm)
           this.$refs.editForm.validate((valid) => {
             if (valid) {
                 this.$confirm('确认提交吗？', '提示', {}).then(() => {
@@ -225,15 +227,20 @@ export default {
                 this.$confirm('确认提交吗？', '提示', {}).then(() => {
                     this.addLoading = true;
                     this.$http.post(g.debugUrl+"saveAdmin",this.$data.addForm).then((res)=>{
-                        console.log(res.body.d)
-                        this.addLoading = false;
-                        this.$message({
-                            message: '提交成功',
-                            type: 'success'
-                        });
-                        this.$refs['addForm'].resetFields();
-                        this.addFormVisible = false;
-                        this.findByPage()
+                        if(res.body.ok == 1){
+                            console.log(res.body.d)
+                            this.addLoading = false;
+                            this.$message({
+                                message: '提交成功',
+                                type: 'success'
+                            });
+                            this.$refs['addForm'].resetFields();
+                            this.addFormVisible = false;
+                            this.findByPage()
+                        }else{
+                            this.$alert('提交失败，用户名重复', '警告', {
+                                confirmButtonText: '确定'})
+                        }
                     });
                 });
             }

@@ -17,18 +17,30 @@
       <el-table v-loading="listLoading" :data="tableData" style="width: 100%">
       <el-table-column prop="createdAt" :formatter="createdateformatter" label="创建日期" style="width: 15%">
       </el-table-column>
-      <el-table-column prop="name" label="医院名" style="width: 10%"></el-table-column>
-      <el-table-column prop="host" label="访问地址" style="width: 10%"></el-table-column>
-      <el-table-column prop="username" label="管理员账号" style="width: 10%"></el-table-column>
-      <el-table-column prop="password" label="管理员密码" style="width: 10%"></el-table-column>
+      <el-table-column prop="name" label="医院名" ></el-table-column>
+      <el-table-column prop="host" label="访问地址" ></el-table-column>
+      <el-table-column label="管理员账号"><template scope="scope">{{scope.row.admin.username}}</template></el-table-column>
+      <el-table-column label="管理员密码"><template scope="scope">{{scope.row.admin.password}}</template></el-table-column>
+      <el-table-column label="状态">
+        <template scope="scope">
+            <el-row>
+            {{statusFor(scope.row.statue)}}
+            <el-button
+                size="small"
+                v-if = "scope.row.statue == 1"
+                @click="handleDelete(scope.$index, scope.row)">运行</el-button>
+            <el-button
+                size="small"
+                v-else
+                @click="handleDelete(scope.$index, scope.row)">关闭</el-button>
+            </el-row>
+        </template>
+      </el-table-column>
       <el-table-column label="操作">
         <template scope="scope">
-          <el-button
-            size="small"
-            @click="onEdit(scope.$index, scope.row)">编辑</el-button>
-          <el-button
-            size="small"
-            @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+            <el-button
+                size="small"
+                @click="onEdit(scope.$index, scope.row)">编辑</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -140,6 +152,16 @@ export default {
     }
   },
   methods: {
+      statusFor(value){
+           switch(value){
+              case 0:
+                  return "运行";
+              case 1:
+                  return "关闭";
+              default:
+                  return ""
+           }
+      },
       onEdit(idx,row){
           this.$data.editFormVisible = true
 		  this.$data.editForm = Object.assign({}, row);
@@ -170,15 +192,23 @@ export default {
           })
       },
       handleDelete(idx,row){
-          this.$confirm('确认删除吗？', '提示', {}).then(() => {
+          this.$confirm('确认修改状态吗？', '提示', {}).then(() => {
             this.$data.listLoading = true
-            this.$http.post(g.debugUrl+"delHospitals",{id:row.id}).then((res)=>{
+            this.$http.post(g.debugUrl+"updateHospitalStatue",{id:row.id,st:row.statue}).then((res)=>{
                 if(res.ok == 1){
                     this.$message({
                         type: 'success',
-                        message: '删除成功!'
+                        message: '修改成功!'
                     });
-                    this.$data.tableData.splice(idx,1)
+                    if(row.statue == 1){
+                        this.$data.tableData[idx].statue = 0
+                    }else{
+                        this.$data.tableData[idx].statue = 1
+                    }
+                }else{
+                    this.$alert('修改失败', '异常', {
+                        confirmButtonText: '确定'
+                    });
                 }  
                 this.$data.listLoading = false          
             },
@@ -209,7 +239,7 @@ export default {
                                 confirmButtonText: '确定'
                             });
                         }else{
-                            this.$alert('登陆失败', '警告', {
+                            this.$alert('添加医院失败', '异常', {
                                 confirmButtonText: '确定'
                             });
                         }
