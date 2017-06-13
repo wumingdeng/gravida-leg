@@ -12,17 +12,21 @@
     </div>
     <el-row type="flex" align="middle" :gutter="20">
       <el-table v-loading="listLoading" :data="tableData" style="width: 100%" @row-click="onRowClick">
-      <el-table-column prop="createdAt" :formatter="createdateformatter" label="就诊时间" style="width: 15%">
+      <el-table-column prop="date_server" label="服务时间">
       </el-table-column>
-      <el-table-column prop="id" label="就诊号" style="width: 15%">
+      <el-table-column prop="date_yunfu" label="怀孕时间" >
       </el-table-column>
-      <el-table-column prop="patient_no" label="就诊人员编号" style="width: 15%">
+      <el-table-column prop="id" label="就诊号" >
       </el-table-column>
-      <el-table-column prop="doctor_no" label="医生编号" style="width: 15%">
+      <el-table-column prop="name" label="用户名字">
       </el-table-column>
-      <el-table-column prop="content" label="内容" style="width: 50%">
+      <el-table-column prop="age" label="年龄" >
       </el-table-column>
-      <el-table-column label="操作" style="width: 5%">
+      <el-table-column prop="height" label="身高">
+      </el-table-column>
+      <el-table-column prop="weight" label="体重">
+      </el-table-column>
+      <el-table-column label="操作">
         <template scope="scope">
           <el-button
             size="small"
@@ -64,7 +68,7 @@ export default {
   },
   methods: {
       onRowClick(row, event, column){
-        var no = row.patient_no
+        var no = row.open_id
         this.$router.push({ name: '客人信息', params: { no: no }})
       },
       createdateformatter(row, column){
@@ -117,7 +121,7 @@ export default {
           })
       },
       open2(idx,row){
-          var no = row.patient_no
+          var no = row.mac_id
           this.$router.push({ name: '客人报告', params: { no: no }})
       }
     },
