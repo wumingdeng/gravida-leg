@@ -40,31 +40,7 @@
           @current-change="handle_setCurPage">
         </el-pagination>
       </el-row>
-        <el-dialog title="编辑" v-model="editFormVisible" :close-on-click-modal="false">
-            <el-form :inline="true" :model="formInline" style='margin-left:70px'>
-                <el-form-item label="孕周">
-                    <el-input v-model="formInline.start" placeholder="起始周"></el-input>
-                </el-form-item>
-                <el-form-item label="到">
-                    <el-input v-model="formInline.end" placeholder="起始周"></el-input>
-                </el-form-item>
-            </el-form>
-            <el-form ref="form" label-width="110px">
-                <el-form-item label="关键词">
-                    <div id="Elem_1" style="text-align:left"></div>
-                </el-form-item>
-                <el-form-item label="饮食">
-                    <div id="Elem_2" style="text-align:left"></div>
-                </el-form-item>
-                <el-form-item label="运动">
-                    <div id="Elem_3" style="text-align:left"></div>
-                </el-form-item>
-                <el-form-item>
-                    <el-button type="primary" @click="onSubmit">保存</el-button>
-                    <el-button>取消</el-button>
-                </el-form-item>
-            </el-form>
-        </el-dialog>
+            
     </section>
 </template>
 
@@ -72,9 +48,6 @@
     import E from 'wangeditor'
     export default {
       name: 'editor',
-      Elem_1:{},
-      Elem_2:{},
-      Elem_3:{},
       data () {
         return {
             curPage:1,
@@ -92,7 +65,7 @@
             editorContent_1: '',
             editorContent_2: '',
             editorContent_3: '',
-            editFormVisible:false,
+            editFormVisible:true,
             curRow:{}
         }
       },
@@ -110,19 +83,17 @@
             this.$data.curPage = currentPage
         },
         onEdit(idx,row){
-          this.$data.editFormVisible = true
-		  this.$data.formInline = Object.assign({}, row);
-          this.curRow = row
+          this.$router.push({name:'modify',params: { type: this.$data.type,isModify:1,row:row}})
         },
         getConfig(){
           this.$data.listLoading = true
           var postData = {
               offset:0,
               limit:this.$data.pageSize,
-              v:this.$data.filters.name,
+              type:this.$data.type
           }
           console.log(postData)
-          this.$http.post(g.debugUrl+"getHospitalsByName",postData).then((res)=>{
+          this.$http.post(g.debugUrl+"find_config",postData).then((res)=>{
               this.$data.total = res.body.d.count;
               this.$data.tableData = res.body.d.rows;  
               this.$data.listLoading = false    
@@ -132,27 +103,32 @@
           })
         },
         handleAdd(){
-
+           this.$router.push({name:'modify',params: { type: this.$data.type,isModify:0}})
+        },
+        getStatus(){
+            switch(path){
+              case "/weight_list":
+                this.type = 1
+              break;
+              case "/gravida_list":
+                this.type = 0
+              break;
+              default:
+              break
+          }
         }
-        
       },
       mounted() {
-        Elem_1 = new E('#Elem_1')
-        Elem_1.customConfig.onchange = (html) => {
-          this.editorContent_1 = html
+        
+      },
+      watch: {
+        '$route' (to, from) {
+            this.curPage = 1
+            this.pageSize = 10
+            this.getStatus(this.$route.path)
+            this.getConfig()
         }
-        Elem_1.create()
-        Elem_2 = new E('#Elem_2')
-        Elem_2.customConfig.onchange = (html) => {
-          this.editorContent_2 = html
-        }
-        Elem_2.create()
-        Elem_3 = new E('#Elem_3')
-        Elem_3.customConfig.onchange = (html) => {
-          this.editorContent_3 = html
-        }
-        Elem_3.create()
-      }
+    }
     }
 </script>
 

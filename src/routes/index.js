@@ -14,7 +14,7 @@ import hospital from '../views/hospital/hospital.vue';
 import test from '../views/test.vue';
 import NotFound from '../views/NotFound.vue';
 import h5Editor from '../views/h5Editor/editor.vue';
-import weightconfig from '../views/h5Editor/editorweight.vue';
+import config from '../views/h5Editor/modifyconfig.vue';
 import {setCookie,getCookie,delCookie} from "../util/cookieUnit.js";
 export default [
    {path: '*', component: NotFound, name: 'notfound'},
@@ -31,8 +31,9 @@ export default [
         { path: '/visiter/:no', component: visiter,name:"客人信息"},
         { path: '/user', component: user,name:"用户管理"},
         { path: '/hospital', component: hospital,name:"医院管理"},
-        { path: '/h5Editor', component: h5Editor,name:""},
-        { path: '/weight', component: weightconfig,name:""},
+        { path: '/weight_list', component: h5Editor,name:""},
+        { path: '/gravida_list', component: h5Editor,name:""},
+        { path: '/config', component: config,name:"modify"},
     ],
     beforeEnter:(to,from,next)=>{
         window.scrollTo(0,0)
