@@ -260,6 +260,8 @@ export default {
    },
    watch: {
         '$route' (to, from) {
+            console.log("dsdfsdf")
+            console.log(this.$route.path)
             this.getStatus(this.$route.path)
             this.findByPage()
         }

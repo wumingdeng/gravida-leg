@@ -30,8 +30,8 @@
                 <el-menu-item index="/hospital" v-if="getWeight('2')">医院管理</el-menu-item>
                 <el-submenu index="2">
                      <template slot="title">文本配置</template>
-                     <el-menu-item index="/weight_list">孕周配置</el-menu-item>
-                    <el-menu-item index="/gravida_list">体重评估配置</el-menu-item>
+                     <el-menu-item index="/gravida_list">孕周配置</el-menu-item>
+                    <el-menu-item index="/weight_list">体重评估配置</el-menu-item>
                 </el-submenu>
                 </el-menu>
             </aside>

@@ -37,7 +37,7 @@
 
 <script>
     import E from 'wangeditor'
-
+    import g from "../../globals/global.js";
     export default {
       name: 'editorweight',
       data () {

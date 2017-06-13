@@ -45,7 +45,7 @@
 </template>
 
 <script>
-    import E from 'wangeditor'
+    import g from "../../globals/global.js";
     export default {
       name: 'editor',
       data () {
@@ -105,16 +105,16 @@
         handleAdd(){
            this.$router.push({name:'modify',params: { type: this.$data.type,isModify:0}})
         },
-        getStatus(){
+        getStatus(path){
             switch(path){
               case "/weight_list":
-                this.type = 1
-              break;
+                this.$data.type = 1
+                break;
               case "/gravida_list":
-                this.type = 0
-              break;
+                this.$data.type = 0
+                 break;
               default:
-              break
+                break
           }
         }
       },
@@ -123,9 +123,9 @@
       },
       watch: {
         '$route' (to, from) {
+            this.getStatus(to.path)
             this.curPage = 1
             this.pageSize = 10
-            this.getStatus(this.$route.path)
             this.getConfig()
         }
     }
