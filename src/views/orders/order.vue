@@ -96,28 +96,35 @@ export default {
     }
   },
   methods: {
-      handleEdit(idx,row){
+    handleEdit(idx,row){
         this.$data.listLoading = true
         var pos={
-          id:row.id,
-          status:++row.status
+            id:row.id,
+            status:++row.status
         }
         this.$http.post(g.debugUrl+"updateOrders",pos).then((res)=>{
-              if(res.ok == 1){
-                  this.$message({
-                    type: 'success',
-                    message: '订单状态修改成功!'
-                  });
-                  row.status = pos.status
-              } else{
-
-              }   
-              this.$data.listLoading = false          
-          },
-          (res)=>{
+            console.log(res)
+            if(res.body.ok == -2){
+                this.$alert('session过期', '异常', {
+                confirmButtonText: '确定'
+                });
+            }else if(res.body.ok == -1){
+                this.$alert('数据库执行失败', '异常', {
+                confirmButtonText: '确定'
+                });
+            }else if(res.body.ok == 1){
+                this.$message({
+                type: 'success',
+                message: '订单状态修改成功!'
+                });
+                row.status = pos.status
+            }
+            this.$data.listLoading = false          
+        },
+        (res)=>{
               this.$data.listLoading = false      
-          })
-      },
+        })
+    },
       setColorStr(color){
         switch(color){
               case 0:

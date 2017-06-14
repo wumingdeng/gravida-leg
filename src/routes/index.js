@@ -31,9 +31,9 @@ export default [
         { path: '/visiter/:no', component: visiter,name:"客人信息"},
         { path: '/user', component: user,name:"用户管理"},
         { path: '/hospital', component: hospital,name:"医院管理"},
-        { path: '/weight_list', component: h5Editor,name:""},
-        { path: '/gravida_list', component: h5Editor,name:""},
-        { path: '/config', component: config,name:"modify"},
+        { path: '/weight_list', component: h5Editor,name:"体重评估配置"},
+        { path: '/gravida_list', component: h5Editor,name:"孕周配置"},
+        { path: '/config', component: config,name:"修改配置"},
     ],
     beforeEnter:(to,from,next)=>{
         window.scrollTo(0,0)
