@@ -85,9 +85,7 @@
         },
         methods: {
             pushphone:function(){
-                this.$http.headers = {"Access-Control-Allow-Origin":"*"}
                 this.$http.get(g.debugUrl+"push_config").then((res)=>{
-                    console.log("eeeeeeeeeee")
                     if(res.body.ok == 1){
                         this.$alert('推送成功', '异常', {
                             confirmButtonText: '确定'
