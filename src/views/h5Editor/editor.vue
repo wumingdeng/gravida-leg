@@ -18,8 +18,8 @@
         </div>
         <el-row type="flex" align="middle" :gutter="10">
             <el-table v-loading="listLoading" :data="tableData" style="width: 100%">
-            <el-table-column prop="start" label="开始周数" width='100' ></el-table-column>
-            <el-table-column prop="end" label="结束周数" width='100'></el-table-column>
+            <el-table-column prop="minWeek" label="开始周数" width='100' ></el-table-column>
+            <el-table-column prop="maxWeek" label="结束周数" width='100'></el-table-column>
             <el-table-column prop='con_diet' label="饮食注意" :show-overflow-tooltip="true" ></el-table-column>
             <el-table-column prop='con_sug' label="建议(关键词)" :show-overflow-tooltip="true" ></el-table-column>
             <el-table-column 
@@ -90,6 +90,10 @@
                         this.$alert('推送成功', '异常', {
                             confirmButtonText: '确定'
                         });
+                    }else if(error){
+                        this.$alert('推送失败', '异常', {
+                            confirmButtonText: '确定'
+                        });
                     }
                     this.$data.listLoading = false    
                 },
@@ -101,7 +105,6 @@
                 })
             },
             weightformatter(row){
-                console.log('sjsjsjjs')
                 if(this.$data.type==1){
                     switch(row.weight_size){
                         case 0:
