@@ -18,13 +18,13 @@
         </div>
         <el-row type="flex" align="middle" :gutter="10">
             <el-table v-loading="listLoading" :data="tableData" style="width: 100%">
-            <el-table-column prop="minWeek" label="开始周数" width='100' ></el-table-column>
-            <el-table-column prop="maxWeek" label="结束周数" width='100'></el-table-column>
-            <el-table-column prop='con_diet' label="饮食注意" :show-overflow-tooltip="true" ></el-table-column>
-            <el-table-column prop='con_sug' label="建议(关键词)" :show-overflow-tooltip="true" ></el-table-column>
+            <el-table-column prop="minweek" label="开始周数" width='100' ></el-table-column>
+            <el-table-column prop="maxweek" label="结束周数" width='100'></el-table-column>
+            <el-table-column prop='con_sug' label="管理建议" :show-overflow-tooltip="true" ></el-table-column>
+            <el-table-column v-if="type==1" prop='con_diet' label="饮食注意" :show-overflow-tooltip="true" ></el-table-column>
             <el-table-column 
                 :show-overflow-tooltip="true"
-                :label="type==1?'体重标准':'运动'"
+                :label="type==1?'体重标准':'标签'"
                 >
                 <template scope="scope">
                     {{weightformatter(scope.row)}}
@@ -105,8 +105,19 @@
                 })
             },
             weightformatter(row){
-                if(this.$data.type==1){
-                    switch(row.weight_size){
+                if(this.$data.type == 0){
+                    switch(row.type){
+                        case 0:
+                            return '关键词';
+                        case 1:
+                            return '饮食';
+                        case 2:
+                            return '运动';
+                        default:
+                            return ''
+                    }
+                }else{
+                    switch(row.type){
                         case 0:
                             return '偏轻';
                         case 1:
@@ -116,8 +127,6 @@
                         default:
                             return ''
                     }
-                }else{
-                    return row.con_sign
                 }
             },
             getContent: function () {
@@ -135,7 +144,7 @@
             onDel(idx,id){
                 this.$confirm('确认删除吗？', '提示', {}).then(() => {
                     this.$data.listLoading = true
-                    this.$http.post(g.debugUrl+"del_config",{id:id}).then((res)=>{
+                    this.$http.post(g.debugUrl+"del_config",{id:id,type:this.$data.type}).then((res)=>{
                         if(res.body.ok == -2){
                             this.$alert('session过期', '异常', {
                             confirmButtonText: '确定'

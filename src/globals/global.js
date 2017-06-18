@@ -5,6 +5,6 @@
 export default {
   r:{},
   // debugUrl:'http://121.40.254.174:8101/api/'
-  debugUrl:'http://192.168.18.165:8101/api/',
+  debugUrl:'http://localhost:8101/api/',
   phoneSer:'http://192.168.18.165:8092/api/',
 }
