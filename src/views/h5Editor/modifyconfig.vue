@@ -37,22 +37,26 @@
         <el-form ref="form" label-width="40px">
             <el-form-item label="建议">
                 <div id="Elem_1" style="text-align:left"></div>
-                <div style="text-align:left">
-                    <el-input v-model="html_1" type="textarea" rows=20 placeholder="html编辑区" style='width:100%;min-height:300px;resize:none'></el-input>
-                </div>
-                <el-button type="primary" @click="editorhtml_1">HTML</el-button>
+                <el-collapse>
+                    <el-collapse-item title="html代码">
+                        <div style="text-align:left">
+                            <el-input v-model="editorContent_1" type="textarea" rows=20 placeholder="html编辑区" @change="onChange_html_1" style='width:100%;min-height:300px;resize:none'></el-input>
+                        </div>
+                    </el-collapse-item>
+                </el-collapse>
             </el-form-item>
             <el-form-item v-if="type==1" label="饮食">
                 <div id="Elem_2" style="text-align:left;flex:left"></div>
-                <div style="text-align:left">
-                    <el-input v-model="html_2" type="textarea" rows=20 placeholder="html编辑区" style='width:100%;min-height:300px;resize:none'></el-input>
-                </div>
-                <el-button type="primary" @click="editorhtml_2">HTML</el-button>
+                <el-collapse>
+                    <el-collapse-item title="html代码">
+                        <div style="text-align:left">
+                            <el-input v-model="editorContent_2" type="textarea" rows=20 placeholder="html编辑区" @change="onChange_html_2" style='width:100%;min-height:300px;resize:none'></el-input>
+                        </div>
+                    </el-collapse-item>
+                </el-collapse>
             </el-form-item>
             <el-form-item>
                 <el-button type="primary" @click="onSubmit" :loading="saveLoading">保存</el-button>
-            </el-form-item>
-            <el-form-item>
                 <el-button type="primary" @click="onSubmitAndPush" :loading="saveLoading">保存并推送</el-button>
             </el-form-item>
         </el-form>
@@ -66,9 +70,7 @@ export default {
     name: 'editorweight',
     data() {
         return {
-            html_1:'',
-            html_2:'',
-            html_enable:false,
+            html_enable: false,
             saveLoading: false,
             type: 0,
             isModify: false,
@@ -79,36 +81,32 @@ export default {
             },
             editorContent_1: '',
             editorContent_2: '',
-            Elem_1:{},
-            Elem_2:{},
+            Elem_1: {},
+            Elem_2: {},
         }
     },
     methods: {
-        handleEdit:function(){
+        onChange_html_1:function(){
+            this.Elem_1.txt.html(this.editorContent_1)
+        },
+        onChange_html_2:function(){
+            this.Elem_2.txt.html(this.editorContent_2)
+        },
+        handleEdit: function () {
 
         },
-        editorhtml_1:function(){
-            console.log(this.html_1)
-            this.Elem_1.txt.html(this.html_1)
-            this.editorContent_1 = this.html_1
-            this.html_enable = true
-        },
-        editorhtml_2:function(){q
-        },
-        
         getContent: function () {
             alert(this.editorContent)
         },
-        onSubmitAndPush:function(){
-
+        onSubmitAndPush: function () {
+            this.onSubmit()
         },
         onSubmit: function (event) {
             this.$data.saveLoading = true
             this.$data.formInline.sug = this.editorContent_1
             this.$data.formInline.diet = this.editorContent_2
-
             console.log(this.$data.formInline)
-            var path = this.type==1?"save_weight_config":"save_diet_config"
+            var path = this.type == 1 ? "save_weight_config" : "save_diet_config"
             console.log(path)
             this.$http.post(g.debugUrl + path, this.$data.formInline).then((res) => {
                 if (res.body.ok == -2) {
@@ -134,11 +132,9 @@ export default {
         getConfig: function (row, Elem_1, Elem_2) {
             this.$data.formInline = Object.assign({}, row);
             Elem_1.txt.text(row.con_sug)
-            this.html_1 = row.con_sug
             this.editorContent_1 = row.con_sug
-            if(this.type == 1){
+            if (this.type == 1) {
                 Elem_2.txt.html(row.con_diet)
-                this.html_2 = row.con_diet
                 this.editorContent_2 = row.con_diet
             }
         }
@@ -149,12 +145,11 @@ export default {
         var Elem_1 = new E('#Elem_1')
         Elem_1.customConfig.onchange = (html) => {
             this.editorContent_1 = html
-            this.html_1 = html
         }
         Elem_1.create()
         this.Elem_1 = Elem_1
 
-        if(this.type==1){
+        if (this.type == 1) {
             var Elem_2 = new E('#Elem_2')
             Elem_2.customConfig.onchange = (html) => {
                 this.editorContent_2 = html
@@ -165,11 +160,12 @@ export default {
         if (this.$data.isModify) {
             this.getConfig(this.$route.params.row, Elem_1, Elem_2)
         }
-        
-       
+
+
     }
 }
 </script>
 
 <style scoped>
+
 </style>

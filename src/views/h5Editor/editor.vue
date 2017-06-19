@@ -1,9 +1,13 @@
 <template>
     <section>
         <div class="toolbar">
-            <el-form :inline="true" :model="filters">
+            <el-form :inline="true">
                 <el-form-item>
-                    <el-input v-model="filters.name" placeholder="姓名"></el-input>
+                    <el-select v-model="filters_type" placeholder="筛选">
+                        <el-option :label="type==0?'关键词':'偏轻'" value="0"></el-option>
+                        <el-option :label="type==0?'饮食':'标准'" value="1"></el-option>
+                        <el-option :label="type==0?'运动':'偏重'" value="2"></el-option>
+                    </el-select>
                 </el-form-item>
                 <el-form-item>
                     <el-button type="primary" v-on:click="getConfig">查询</el-button>
@@ -69,8 +73,9 @@
                 total:0,
                 listLoading:false,
                 tableData:[],
+                filters_type:'',
                 filters: {
-                    name: ''
+                    type: ''
                 },  
                 formInline: {
                     start: '',
@@ -174,6 +179,9 @@
                     limit:this.$data.pageSize,
                     type:this.$data.type
                 }
+                if(this.filters_type != ''){
+                    postData.ft = this.filters_type
+                }
                 console.log(postData)
                 this.$http.post(g.debugUrl+"find_config",postData).then((res)=>{
                     if(res.body.ok == -2){
@@ -216,6 +224,7 @@
         },
         watch: {
             '$route' (to, from) {
+                this.filters_type = ''
                 this.getStatus(to.path)
                 this.curPage = 1
                 this.pageSize = 10
