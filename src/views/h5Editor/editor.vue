@@ -6,7 +6,7 @@
                     <el-select v-model="filters_type" placeholder="筛选">
                         <el-option :label="type==0?'关键词':'偏轻'" value="0"></el-option>
                         <el-option :label="type==0?'饮食':'标准'" value="1"></el-option>
-                        <el-option :label="type==0?'运动':'偏重'" value="2"></el-option>
+                        <el-option :label="type==0?'运动':'偏重'" value="2"></el-option>    
                     </el-select>
                 </el-form-item>
                 <el-form-item>
@@ -24,9 +24,7 @@
             <el-table v-loading="listLoading" :data="tableData" style="width: 100%">
             <el-table-column prop="minweek" label="开始周数" width='100' ></el-table-column>
             <el-table-column prop="maxweek" label="结束周数" width='100'></el-table-column>
-            <el-table-column prop='con_sug' label="管理建议" :show-overflow-tooltip="true" ></el-table-column>
-            <el-table-column v-if="type==1" prop='con_diet' label="饮食注意" :show-overflow-tooltip="true" ></el-table-column>
-            <el-table-column 
+            <el-table-column width='100'
                 :show-overflow-tooltip="true"
                 :label="type==1?'体重标准':'标签'"
                 >
@@ -34,6 +32,9 @@
                     {{weightformatter(scope.row)}}
                 </template>
             </el-table-column>
+            <el-table-column prop='con_sug' label="管理建议" :show-overflow-tooltip="true" ></el-table-column>
+            <el-table-column v-if="type==1" prop='con_diet' label="饮食注意" :show-overflow-tooltip="true" ></el-table-column>
+            
             <el-table-column label="操作" width='200'>
                 <template scope="scope">
                     <el-button
@@ -95,7 +96,7 @@
                         this.$alert('推送成功', '异常', {
                             confirmButtonText: '确定'
                         });
-                    }else if(error){
+                    }else if(res.body.error){
                         this.$alert('推送失败', '异常', {
                             confirmButtonText: '确定'
                         });
@@ -139,9 +140,12 @@
             },
             handle_setPageSize(pageSize){
                 this.$data.pageSize = pageSize
+                this.getConfig()
             },
             handle_setCurPage(currentPage){
+                console.log(currentPage)
                 this.$data.curPage = currentPage
+                this.getConfig()
             },
             onEdit(idx,row){
                 this.$router.push({name:'修改配置',params: { type: this.$data.type,isModify:1,row:row}})
@@ -175,7 +179,7 @@
             getConfig(){
                 this.$data.listLoading = true
                 var postData = {
-                    offset:0,
+                    offset:(this.$data.curPage-1)*this.$data.pageSize,
                     limit:this.$data.pageSize,
                     type:this.$data.type
                 }

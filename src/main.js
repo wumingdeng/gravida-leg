@@ -23,6 +23,14 @@ const router = new VueRouter({
   routes: routes,
 });
 
+router.afterEach(route => {
+    if (process.env.NODE_ENV == 'development') return;
+
+    localStorage.page = route.fullPath.substring(1); //保存当前路由 刷新的时候用
+    window.setTimeout(wxApi.init.bind(this,route.meta.share),50)  //加个延时 要不location.href 还是旧的路由
+    
+})
+
 window.eventBus = new Vue({});
 
 new Vue({

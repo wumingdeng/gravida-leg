@@ -1,1 +1,1 @@
-export const PROJECTS = 'projects/Infos'
+export const PROJECTS = 'push_config'

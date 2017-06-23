@@ -45,9 +45,9 @@
                     </el-collapse-item>
                 </el-collapse>
             </el-form-item>
-            <el-form-item v-if="type==1" label="饮食">
+            <el-form-item  :label="type==1?'饮食':''">
                 <div id="Elem_2" style="text-align:left;flex:left"></div>
-                <el-collapse>
+                <el-collapse v-if="type==1">
                     <el-collapse-item title="html代码">
                         <div style="text-align:left">
                             <el-input v-model="editorContent_2" type="textarea" rows=20 placeholder="html编辑区" @change="onChange_html_2" style='width:100%;min-height:300px;resize:none'></el-input>
@@ -86,10 +86,10 @@ export default {
         }
     },
     methods: {
-        onChange_html_1:function(){
+        onChange_html_1: function () {
             this.Elem_1.txt.html(this.editorContent_1)
         },
-        onChange_html_2:function(){
+        onChange_html_2: function () {
             this.Elem_2.txt.html(this.editorContent_2)
         },
         handleEdit: function () {
@@ -98,8 +98,20 @@ export default {
         getContent: function () {
             alert(this.editorContent)
         },
+        pushConfig: function () {
+            console.log('推送')
+            this.$store.dispatch('push_config', {
+                self: this,
+                callback: function (self, res) {
+                    this.$message({
+                        message: '保存并推送成功',
+                        type: 'success'
+                    });
+                }
+            })
+        },
         onSubmitAndPush: function () {
-            this.onSubmit()
+            this.onSubmit(this.pushConfig())
         },
         onSubmit: function (event) {
             this.$data.saveLoading = true
@@ -118,10 +130,14 @@ export default {
                         confirmButtonText: '确定'
                     });
                 } else {
-                    this.$message({
-                        message: '保存成功',
-                        type: 'success'
-                    });
+                    if (typeof (event) == "function") {
+                        event()
+                    }else{
+                        this.$message({
+                            message: '成功',
+                            type: 'success'
+                        });
+                    }
                 }
                 this.$data.saveLoading = false
             },
@@ -148,7 +164,7 @@ export default {
         }
         Elem_1.create()
         this.Elem_1 = Elem_1
-
+        console.log(this.type == 1)
         if (this.type == 1) {
             var Elem_2 = new E('#Elem_2')
             Elem_2.customConfig.onchange = (html) => {

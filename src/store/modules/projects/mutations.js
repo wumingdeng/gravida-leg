@@ -3,8 +3,8 @@ import {
 } from './mutation-types'
 import g from '../../../globals/global'
 const mutations = {
-  [PROJECTS] (state, projectInfos) {
-    state.projectInfos = projectInfos
+  [PROJECTS] (state, result) {
+    state.projectInfos = result
   }
 }
 
