@@ -18,10 +18,10 @@
         </el-col>
         <el-col :span="24" class="main">
             <aside :class="collapsed?'menu-collapsed':'menu-expanded'">
-                <el-menu default-active="/" theme="dark" :router="true">
+                <el-menu default-active="/home" theme="dark" :router="true">
                 <el-submenu index="1" v-if="getWeight('0')">
                     <template slot="title">订单管理</template>
-                    <el-menu-item index="/">未付款<div v-if="s1_cout>0" class="notice">{{s1_cout}}</div></el-menu-item>
+                    <el-menu-item index="/home">未付款<div v-if="s1_cout>0" class="notice">{{s1_cout}}</div></el-menu-item>
                     <el-menu-item index="/fukuan">已付款<div v-if="s2_cout>0" class="notice">{{s2_cout}}</div></el-menu-item>
                     <el-menu-item index="/weishouhuo">未发货<div v-if="s3_cout>0" class="notice">{{s3_cout}}</div></el-menu-item>
                     <el-menu-item index="/shouhuo">已发货<div v-if="s4_cout>0" class="notice">{{s4_cout}}</div></el-menu-item>
@@ -82,7 +82,7 @@ export default {
                     if(res.body.ok == 1){
                         console.log("signOut")
                         setCookie('user', null);
-                        _this.$router.push('/login');
+                        _this.$router.push('/');
                     } else{
                         this.$alert('退出失败', '警告', {
                             confirmButtonText: '确定'

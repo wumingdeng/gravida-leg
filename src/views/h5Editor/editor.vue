@@ -34,7 +34,6 @@
             </el-table-column>
             <el-table-column prop='con_sug' label="管理建议" :show-overflow-tooltip="true" ></el-table-column>
             <el-table-column v-if="type==1" prop='con_diet' label="饮食注意" :show-overflow-tooltip="true" ></el-table-column>
-            
             <el-table-column label="操作" width='200'>
                 <template scope="scope">
                     <el-button

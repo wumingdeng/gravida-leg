@@ -19,7 +19,7 @@ import { setCookie, getCookie, delCookie } from "../util/cookieUnit.js";
 export default [
     { path: '*', component: NotFound, name: 'notfound' },
     {
-        path: '/',
+        path: '/home',
         component: home,
         children: [
             { path: '/', component: order, name: "未付款记录" },
@@ -41,7 +41,7 @@ export default [
             console.log(user)
             if (user == undefined || user == null || user == 'null') {
                 console.log("返回登陆界面")
-                next('/login')
+                next('/')
             } else {
                 console.log('当前页面')
                 next()
@@ -49,7 +49,7 @@ export default [
         }
     },
     {
-        path: '/login',
+        path: '/',
         component: login,
         name: "login"
     },

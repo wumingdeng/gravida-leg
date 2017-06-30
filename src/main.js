@@ -7,6 +7,7 @@ import routes from './routes';
 import VueRouter from 'vue-router';
 import VueResource from 'vue-resource'
 import store from './store/store';
+import g from './globals/global.js';
 
 Vue.use(VueResource)
 Vue.use(ElementUI);
@@ -18,17 +19,13 @@ Vue.http.options.credentials = true;
 
 // 创建一个路由对象用于管理页面的路由
 const router = new VueRouter({
-  base:'/gm/',
   mode: 'history',
   routes: routes,
 });
 
 router.afterEach(route => {
-    if (process.env.NODE_ENV == 'development') return;
-
-    localStorage.page = route.fullPath.substring(1); //保存当前路由 刷新的时候用
-    window.setTimeout(wxApi.init.bind(this,route.meta.share),50)  //加个延时 要不location.href 还是旧的路由
-    
+    g.page = route.fullPath.substring(1); //保存当前路由 刷新的时候用
+    console.log(g.page)
 })
 
 window.eventBus = new Vue({});
