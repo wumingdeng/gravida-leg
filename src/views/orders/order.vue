@@ -54,7 +54,11 @@
                 <el-button
                     v-else-if="scope.row.status == 2" 
                     size="small"
-                    @click="open2(scope.$index, scope.row)">发货</el-button>
+                    @click="dialogFormVisible = true">发货</el-button>
+                <el-button
+                    v-else-if="scope.row.status == 3" 
+                    size="small"
+                    @click="open2(scope.$index, scope.row)">查看物流</el-button>
                 <el-button
                     v-else
                     size="small"
@@ -64,32 +68,55 @@
         </el-table-column>
     </el-table>
   </el-row>
-      <el-row type="flex" justify="end" style="padding:20px 0; ">
-        <el-pagination
-          :current-page="curPage"
-          :page-sizes="[10, 20, 30, 40]"
-          :page-size="pageSize"
-          layout="sizes, prev, pager, next"
-          :total="total"
-          @size-change="handle_setPageSize"
-          @current-change="handle_setCurPage">
-        </el-pagination>
-      </el-row>
+    <el-row type="flex" justify="end" style="padding:20px 0; ">
+    <el-pagination
+        :current-page="curPage"
+        :page-sizes="[10, 20, 30, 40]"
+        :page-size="pageSize"
+        layout="sizes, prev, pager, next"
+        :total="total"
+        @size-change="handle_setPageSize"
+        @current-change="handle_setCurPage">
+    </el-pagination>
+    </el-row>
+      <el-dialog title="快递信息" :visible.sync="dialogFormVisible">
+        <el-form :model="expForm">
+            <el-form-item label="快递编号" :label-width='formLabelWidth'>
+            <el-input v-model="expForm.name" auto-complete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="快递公司" :label-width="formLabelWidth">
+            <el-select v-model="expForm.no" placeholder="请选择快递公司">
+                <el-option
+                    v-for="item in options"
+                    :key="item.key"
+                    :label="item.value"
+                    :value="item.key">
+                </el-option>
+            </el-select>
+            </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+            <el-button @click="dialogFormVisible = false">取 消</el-button>
+            <el-button type="primary" @click="dialogFormVisible = false">确 定</el-button>
+        </div>
+    </el-dialog>
 </div>
 </template>
 
 <script>
 import api from "../../util/api.js";
 import g from "../../globals/global.js";
+import expNos from "../../globals/expressNo.json";
 export default {
   data () {
     return {
         statusName:[
-					'待付款',
-					'已付款',
-					'未发货',
-					'已发货'
-				],
+            '待付款',
+            '已付款',
+            '未发货',
+            '已发货'
+        ],
+        dialogFormVisible:false,
         curPage:1,
         pageSize:10,
         total:10,
@@ -97,8 +124,36 @@ export default {
         listLoading: false,
         status:0,
         filters: {
-					name: ''
-				},
+            name: ''
+        },
+        expForm:{
+            name:'',
+            no:''
+        },
+        formLabelWidth: '120px',
+        options:[
+            {key:"AJ",value:"安捷快递"},
+            {key:"BTWL",value:"百世快运"},
+            {key:"DBL",value:"德邦"},
+            {key:"EMS",value:"EMS"},
+            {key:"FEDEX",value:"FEDEX联邦(国内件）"},
+            {key:"FEDEX_GJ",value:"FEDEX联邦(国际件)"},
+            {key:"GTO",value:"国通快递"},
+            {key:"HHTT",value:"天天快递"},
+            {key:"HTKY",value:"百世快递"},
+            {key:"SF",value:"顺丰快递"},
+            {key:"STO",value:"申通快递"},
+            {key:"YD",value:"韵达快递"},
+            {key:"YTO",value:"圆通速递"},
+            {key:"YZPY",value:"邮政平邮/小包"},
+            {key:"ZJS",value:"宅急送"},
+            {key:"ZTO",value:"中通速递"},
+            {key:"AMAZON",value:"亚马逊物流"},
+            {key:"SUBIDA",value:"速必达物流"},
+            {key:"CJKD",value:"城际快递"},
+            {key:"CNPEX",value:"CNPEX中邮快递"},
+            {key:"HPTEX",value:"海派通物流公司"}
+        ],
     }
   },
   methods: {
@@ -121,9 +176,7 @@ export default {
             }else if(res.body.ok == 1){
                 this.$message({
                 type: 'success',
-                message: '订单状态修改成功!'
-                });
-                this.$data.tableData.splice(idx,1)
+                message: '订单状态修改成'})
             }
             this.$data.listLoading = false          
         },
@@ -190,6 +243,8 @@ export default {
                     message: '取消输入'
                 });
             });
+          }else if(status==3){
+
           }else{
             this.$confirm('是否修改该订单的状态, 是否继续?', '提示', {
                 confirmButtonText: '确定',
