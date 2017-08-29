@@ -25,7 +25,7 @@ export default {
     background-color:#f00;
     border-radius:50%;
     position:absolute;
-    right:60px;
+    right:130px;
     top:5px;
   }
   .toolbar {

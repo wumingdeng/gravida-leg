@@ -25,9 +25,9 @@
         </el-table-column>
         <el-table-column label='金额' align='center'>
             <template scope="scope">
-                <el-row>单价:{{scope.row.products[0].price}}</el-row>
-                <el-row style='color:#ff0000'>优惠:{{scope.row.products[0].discount}}</el-row>
-                <el-row>合计:{{scope.row.products[0].price-scope.row.products[0].discount}}</el-row>
+                <el-row>单价:{{scope.row.products[0].price}}￥</el-row>
+                <el-row style='color:#ff0000'>优惠:{{scope.row.products[0].price-scope.row.price}}￥</el-row>
+                <el-row>合计:{{scope.row.price}}￥</el-row>
             </template>
         </el-table-column>
         <el-table-column width='200' label='订单信息' align='center'>
@@ -54,7 +54,7 @@
                 <el-button
                     v-else-if="scope.row.status == 2" 
                     size="small"
-                    @click="dialogFormVisible = true">发货</el-button>
+                    @click="open2(scope.$index, scope.row)">发货</el-button>
                 <el-button
                     v-else-if="scope.row.status == 3" 
                     size="small"
@@ -63,6 +63,11 @@
                     v-else
                     size="small"
                     >无操作</el-button>
+                </el-row>
+                <el-row v-if="scope.row.status == 3" >
+                    <el-button
+                    size="small"
+                    @click="open3(scope.$index, scope.row)">修改物流</el-button>
                 </el-row>
             </template>
         </el-table-column>
@@ -97,7 +102,13 @@
         </el-form>
         <div slot="footer" class="dialog-footer">
             <el-button @click="dialogFormVisible = false">取 消</el-button>
-            <el-button type="primary" @click="dialogFormVisible = false">确 定</el-button>
+            <el-button type="primary" @click="handleEdit(expForm.idx,expForm.row)">确 定</el-button>
+        </div>
+    </el-dialog>
+    <el-dialog title="物流信息" :visible.sync="dialog_exp_visible">
+        <tr v-for="item in info_exps" :label="item.AcceptStation">{{item.AcceptTime}} : {{item.AcceptStation}}</tr>
+        <div slot="footer" class="dialog-footer">
+            <el-button type="primary" @click="dialog_exp_visible = false">确 定</el-button>
         </div>
     </el-dialog>
 </div>
@@ -117,6 +128,7 @@ export default {
             '已发货'
         ],
         dialogFormVisible:false,
+        dialog_exp_visible:false,
         curPage:1,
         pageSize:10,
         total:10,
@@ -127,9 +139,12 @@ export default {
             name: ''
         },
         expForm:{
+            idx:0,
+            row:{},
             name:'',
             no:''
         },
+        change:false,
         formLabelWidth: '120px',
         options:[
             {key:"AJ",value:"安捷快递"},
@@ -154,15 +169,24 @@ export default {
             {key:"CNPEX",value:"CNPEX中邮快递"},
             {key:"HPTEX",value:"海派通物流公司"}
         ],
+        info_exps:[]
     }
   },
   methods: {
     handleEdit(idx,row){
         this.$data.listLoading = true
-        var pos={
-            id:row.id,
-            status:++row.status
+        var st = 0
+        if(this.$data.change){
+            st = row.status
+        }else{
+            st = ++row.status
         }
+        var pos={id:row.id,status:st}
+        if(row.status==3){
+            pos.com_no = this.$data.expForm.no
+            pos.exp_order_no = this.$data.expForm.name 
+        }
+        console.log(pos.com_no + " : "+ pos.id+ " : "+ pos.exp_order_no)
         this.$http.post(g.debugUrl+"updateOrders",pos).then((res)=>{
             console.log(res)
             if(res.body.ok == -2){
@@ -177,8 +201,25 @@ export default {
                 this.$message({
                 type: 'success',
                 message: '订单状态修改成'})
+                if(!this.$data.change){
+                    this.$data.tableData.splice(idx,1)
+                }else{
+                    row.exp_com_no = this.$data.expForm.no
+                    row.exp_no = this.$data.expForm.name
+                }
+                this.$data.expForm = {
+                    idx:0,
+                    row:{},
+                    name:'',
+                    no:''
+                }
+            }else if(res.body.ok== 0){
+                this.$alert('参数异常', '异常', {
+                confirmButtonText: '确定'
+                });
             }
-            this.$data.listLoading = false          
+            this.$data.listLoading = false     
+            this.$data.dialogFormVisible = false     
         },
         (res)=>{
               this.$data.listLoading = false      
@@ -226,25 +267,55 @@ export default {
               this.$data.listLoading = false   
           })
       },
+      open3(idx,row){
+        this.$data.dialogFormVisible = true
+        this.$data.expForm.idx = idx
+        this.$data.expForm.row = row
+        this.$data.expForm.name = row.exp_no 
+        this.$data.expForm.no = row.exp_com_no
+        this.$data.change = true
+      },
       open2(idx,row) {
+          this.$data.change = false
           if(status==2){
-            this.$prompt('请输入快递单号', '提示', {
-                confirmButtonText: '确定',
-                cancelButtonText: '取消',
-            }).then(({ value }) => {
-                this.$message({
-                    type: 'success',
-                    message: '你输入的快递单号: ' + value
-                });
-                this.handleEdit(idx,row)
-            }).catch(() => {
-                this.$message({
-                    type: 'info',
-                    message: '取消输入'
-                });
-            });
+              this.$data.dialogFormVisible = true
+              this.$data.expForm.idx = idx
+              this.$data.expForm.row = row
           }else if(status==3){
-
+            //   var pos={expNo:3953420657949,expCode:"YD"}
+            var pos = {
+                expNo:row.exp_no,
+                expCode:row.exp_com_no
+            }
+            this.$data.listLoading = true
+            this.$http.post(g.debugUrl+"getExpInfo",pos).then((res)=>{
+                console.log(res)
+                if(res.body.ok == -2){
+                    this.$alert('session过期', '异常', {
+                    confirmButtonText: '确定'
+                    });
+                }else if(res.body.ok == -1){
+                    this.$alert('数据库执行失败', '异常', {
+                    confirmButtonText: '确定'
+                    });
+                }else if(res.body.ok == 1){
+                    var info = res.body.d
+                    if(info["Success"] && !info["Reason"]){
+                        this.$data.info_exps = info["Traces"]
+                        this.$data.dialog_exp_visible = true
+                    }else{
+                        info = info["Reason"]
+                        this.$alert(info, '物流信息', {
+                            confirmButtonText: '确定'
+                        }); 
+                    }
+                }
+                this.$data.listLoading = false 
+            },
+            (res)=>{
+                this.$data.listLoading = false      
+            })
+              
           }else{
             this.$confirm('是否修改该订单的状态, 是否继续?', '提示', {
                 confirmButtonText: '确定',
@@ -303,7 +374,6 @@ export default {
    },
    watch: {
         '$route' (to, from) {
-            
             this.getStatus(this.$route.path)
             this.findByPage()
         }

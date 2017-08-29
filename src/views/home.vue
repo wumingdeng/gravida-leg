@@ -125,16 +125,16 @@ export default {
         eventBus.$on("onselectedOrder",function(status){
             switch(status){
               case '0':
-                this.$data.s1_cout--
+                this.$data.s1_cout = 0
               break;
               case '1':
-                this.$data.s2_cout--
+                this.$data.s2_cout = 0
               break;
               case '2':
-                this.$data.s3_cout--
+                this.$data.s3_cout = 0
               break;
               case '3':
-                this.$data.s4_cout--
+                this.$data.s4_cout = 0
               break;
               default:
               break
