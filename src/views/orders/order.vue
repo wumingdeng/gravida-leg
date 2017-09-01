@@ -117,7 +117,7 @@
 <script>
 import api from "../../util/api.js";
 import g from "../../globals/global.js";
-import expNos from "../../globals/expressNo.json";
+import expNos from "../../../expressNo.json";
 export default {
   data () {
     return {
@@ -195,6 +195,10 @@ export default {
                 });
             }else if(res.body.ok == -1){
                 this.$alert('数据库执行失败', '异常', {
+                confirmButtonText: '确定'
+                });
+            }else if(res.body.ok == 11){
+                this.$alert('库存不足', '提示', {
                 confirmButtonText: '确定'
                 });
             }else if(res.body.ok == 1){
@@ -285,7 +289,11 @@ export default {
             //   var pos={expNo:3953420657949,expCode:"YD"}
             var pos = {
                 expNo:row.exp_no,
-                expCode:row.exp_com_no
+                expCode:row.exp_com_no,
+                color:row.color,
+                size:row.size,
+                amount:row.count,
+                pid:row.pid
             }
             this.$data.listLoading = true
             this.$http.post(g.debugUrl+"getExpInfo",pos).then((res)=>{
@@ -370,6 +378,7 @@ export default {
       }
     },
    mounted (){
+       this.getStatus(this.$route.path)
        this.findByPage()
    },
    watch: {

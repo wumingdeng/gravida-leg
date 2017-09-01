@@ -28,6 +28,7 @@ router.afterEach(route => {
     console.log(g.page)
 })
 
+window.global = g
 window.eventBus = new Vue({});
 
 new Vue({

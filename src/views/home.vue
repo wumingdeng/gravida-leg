@@ -33,6 +33,12 @@
                      <el-menu-item index="/gravida_list">孕周配置</el-menu-item>
                     <el-menu-item index="/weight_list">体重评估配置</el-menu-item>
                 </el-submenu>
+                <el-submenu index="3">
+                     <template slot="title">入库分销</template>
+                     <el-menu-item index="/operate">入库出库</el-menu-item>
+                    <el-menu-item index="/goods_list">记录明细</el-menu-item>
+                </el-submenu>
+                <el-menu-item index="/goods_config">货号配置</el-menu-item>
                 </el-menu>
             </aside>
             <section class="content-container">

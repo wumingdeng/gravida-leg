@@ -11,10 +11,14 @@ import visiter from '../views/visits/visiter.vue';
 import report from '../views/visits/report.vue';
 import user from '../views/users/user.vue';
 import hospital from '../views/hospital/hospital.vue';
+import goods_config from '../views/goods/goods_config.vue';
+import goods_list from '../views/goods/goods_list.vue';
+import operate from '../views/storage/operate.vue';
 import test from '../views/test.vue';
 import NotFound from '../views/NotFound.vue';
 import h5Editor from '../views/h5Editor/editor.vue';
 import config from '../views/h5Editor/modifyconfig.vue';
+
 import { setCookie, getCookie, delCookie } from "../util/cookieUnit.js";
 export default [
     { path: '*', component: NotFound, name: 'notfound' },
@@ -34,6 +38,10 @@ export default [
             { path: '/weight_list', component: h5Editor, name: "体重评估配置" },
             { path: '/gravida_list', component: h5Editor, name: "孕周配置" },
             { path: '/config', component: config, name: "修改配置" },
+            { path: '/goods_config', component: goods_config, name: "货号配置" },
+            { path: '/goods_list', component: goods_list, name: "入库分销记录" },
+            { path: '/operate', component: operate, name: "入库分销" },
+           
         ],
         beforeEnter: (to, from, next) => {
             window.scrollTo(0, 0)
