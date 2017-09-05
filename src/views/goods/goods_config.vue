@@ -41,6 +41,14 @@
                 <el-form-item label="货品名称">
                     <el-input v-model="form.name"></el-input>
                 </el-form-item>
+                <el-form-item v-if="isIn" label="货物颜色" >
+                    <el-select id = 'color' v-model="form.color" placeholder="请选择颜色" >
+                        <el-option v-for="(color,idx) in colors" :label="color" :value="idx" :key="idx"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="货品尺寸">
+                    <el-input v-model="form.size"></el-input>
+                </el-form-item>
                 <el-form-item label="备注">
                     <el-input v-model="form.desc"></el-input>
                 </el-form-item>
@@ -127,7 +135,8 @@ export default {
                         pid: "",
                         name: '',
                         color: '',
-                        size: ''
+                        size: '',
+                        desc:''
                     }
                 } else {
                     this.$alert('参数异常', '异常', {
