@@ -40,7 +40,8 @@ export default [
             { path: '/config', component: config, name: "修改配置" },
             { path: '/goods_config', component: goods_config, name: "货号配置" },
             { path: '/goods_list', component: goods_list, name: "入库分销记录" },
-            { path: '/operate', component: operate, name: "入库分销" },
+            { path: '/in_storage', component: operate, name: "入库操作" },
+            { path: '/out_storage', component: operate, name: "出库操作" },
            
         ],
         beforeEnter: (to, from, next) => {

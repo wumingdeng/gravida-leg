@@ -8,35 +8,49 @@
                 <el-form-item>
                     <el-button type="primary" v-on:click="getGoods(filters)">查询</el-button>
                 </el-form-item>
-                <el-form-item>
-                    <el-button type="primary" v-on:click="onOperate(true)">入库</el-button>
+                <el-form-item v-if="isIn">
+                    <el-button type="primary" v-on:click="onOperate()">入库</el-button>
                 </el-form-item>
-                <!--
-                <el-form-item>
-                    <el-button type="primary" v-on:click="onOperate(false)">出库</el-button>
+                <el-form-item v-else>
+                    <el-button type="primary" v-on:click="onOperate()">出库</el-button>
                 </el-form-item>
-                -->
             </el-form>
         </div>
-        <el-dialog　:visible.sync="form_visible" :title="dialog_title">
+        <el-dialog　:visible.sync="form_visible" :title="isIn?'入库操作':'出库操作'">
             <el-form ref="form" :model="form" :rules="formrules" label-width="80px">
-                <el-form-item v-if="isIn" label="货号">
-                    <el-input v-model="form.pid"></el-input>
-                </el-form-item>
-                <el-form-item v-if="isIn" label="尺码" >
-                    <el-input v-model="form.size"></el-input>
+            <el-form-item label="货号" >
+                <el-select
+                    v-model="form.pid"
+                    filterable
+                    remote
+                    placeholder="请输入关键字"
+                    :remote-method="remoteMethod"
+                    :loading="loading"
+                    @change="onSelected">
+                    <el-option
+                    v-for="item in options4"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value">
+                    </el-option>
+                </el-select>
+                 </el-form-item>
+                <el-form-item label="尺码" >
+                    <el-select id = 'color' v-model="form.size" placeholder="请选择尺寸" >
+                        <el-option v-for="s in sizes" :label="s" :value="s" :key="s"></el-option>
+                    </el-select>
                 </el-form-item>
                 <el-form-item label="数量">
                     <el-input v-model="form.amount"></el-input>
                 </el-form-item>
-                <el-form-item v-if="isIn" label="货物颜色" >
+                <el-form-item label="货物颜色" >
                     <el-select id = 'color' v-model="form.color" placeholder="请选择颜色" >
-                        <el-option v-for="(color,idx) in colors" :label="color" :value="idx" :key="idx"></el-option>
+                        <el-option v-for="co in colors" :label="co" :value="co" :key="co"></el-option>
                     </el-select>
                 </el-form-item>
                 <el-form-item label="原因" >
                     <el-radio-group v-model="form.desc">
-                        <el-radio v-for="(desc,idx) in desc_statics" :key="idx" :label="idx">{{desc}}</el-radio>
+                        <el-radio v-for="desc in desc_statics" :key="desc.index" :label="desc.desc">{{desc.desc}}</el-radio>
                     </el-radio-group>
                 </el-form-item>
                 <el-form-item label="备注">
@@ -54,18 +68,18 @@
                     </el-table-column>
                     <el-table-column prop="name" label='货名' align='center'>
                     </el-table-column>
-                    <el-table-column width='80' prop="color" label='颜色' align='center' :formatter="getColor">
+                    <el-table-column width='80' prop="color" label='颜色' align='center'>
                     </el-table-column>
                     <el-table-column width='80' prop="size" label='尺寸' align='center'>
                     </el-table-column>
                     <el-table-column prop="amount" label='数量' align='center'>
                     </el-table-column>
-                    <el-table-column label='最新出入库时间' align='center' prop="updatedAt" :formatter="createdateformatter">
+                    <el-table-column :label="isIn?'最新入库时间':'最新出库时间'" align='center' prop="updatedAt" :formatter="createdateformatter">
                     </el-table-column>
-                    <el-table-column  width='80' label='操作' align='center'>
+                    <el-table-column v-if="!isIn" width='80' label='操作' align='center'>
                         <template scope="scope">
                             <el-row>
-                                <el-button size="small" type="primary" @click="onOperate(false,scope.row)">出库</el-button>
+                                <el-button size="small" type="primary" @click="onOperate(scope.row)">出库</el-button>
                             </el-row>
                         </template>
                     </el-table-column>
@@ -78,7 +92,6 @@
     </div>
 </template>
 <script>
-import storage from "../../../storage.json";
 export default {
     data() {
         return {
@@ -94,8 +107,13 @@ export default {
             filters: {
                 pid: ''
             },
-            colors: storage.color,
-            desc_statics: {},
+            options4:[],
+            colors:[],
+            sizes:[],
+            storages: window.global.staticConfigs.storage_configs,
+            desc_statics:[],
+            list:[],
+            loading:false,
             form_visible: false,
             out_visible: false,
             listLoading: false,
@@ -103,7 +121,6 @@ export default {
             curPage: 1,
             pageSize: 10,
             total: 10,
-            dialog_title: "",
             isIn: false, //是否为出库
             formrules: {
                 pid: [
@@ -130,6 +147,27 @@ export default {
         }
     },
     methods: {
+        onSelected(value) {
+            if(value=='') return
+            console.log("ADFASD"+value)
+            var storage = this.storages[value]
+            this.sizes = storage.size.split(',')
+            this.colors = storage.color.split(',')
+        },
+        remoteMethod(query) {
+            if (query !== '') {
+            this.loading = true;
+            setTimeout(() => {
+                this.loading = false;
+                this.options4 = this.list.filter(item => {
+                return item.label.toLowerCase()
+                    .indexOf(query.toLowerCase()) > -1;
+                });
+            }, 200);
+            } else {
+            this.options4 = [];
+            }
+        },
         onSubmit() {
             if (this.form.pid.toString().trim() == '') {
                 this.$alert('请输入货号');
@@ -229,41 +267,29 @@ export default {
                 })
         },
         //sign true 为入库，false 为出库
-        onOperate(arg, row) {
+        onOperate(row) {
             delete this.form.id;
-            console.log(this.form.id)
             this.form.pid = ''
             this.form.name = ''
             this.form.color = ''
             this.form.size = ''
             this.form.desc = ''
             this.form.desc_con = ''
-            this.isIn = arg
             this.form_visible = true
-            if (arg) {
-                this.dialog_title = "入库操作"
-                this.desc_statics = storage.in
-            } else {
-                this.dialog_title = "出库操作"
-                this.desc_statics = storage.out
-            }
+           
             if (row) {
                 this.form.pid = row.pid
                 this.form.name = row.name
                 this.form.size = row.size
                 this.form.color = row.color
                 this.form.desc = row.desc
-                if(arg){ // 修改
+                if(this.isIn){ // 修改
                     console.log(row.id)
                     this.form.desc_con = row.desc_con
                     this.form.amount = row.amount
                     this.form.id = row.id
                 }
             }
-        },
-        getColor(row, column) {
-            var value = row.color
-            return this.$data.colors[value]
         },
         handle_setPageSize(pageSize) {
             this.$data.pageSize = pageSize
@@ -289,12 +315,45 @@ export default {
 
         },
         handleChange(self) {
-            console.log('dkdjkdjk')
             self.value = self.value.replace(/\D/gi, "")
+        },
+        getStatus(path){
+             if(path=="/in_storage"){
+                this.isIn = true
+             }else if(path=="/out_storage"){
+                 this.isIn = false
+             }
+        },
+        sortData(){
+            var states = []
+            for(var key in this.storages){
+                var s = this.storages[key]
+                states.push(s['pid'])
+            }
+            this.list = states.map(item => {
+                return { value: item, label: item };
+            });
+
+            var descs = window.global.staticConfigs.desc_configs
+            for(var key in descs){
+               var desc = descs[key]
+               if(this.isIn && desc['type']==1){
+                   this.desc_statics.push(desc)
+               }else if(!this.isIn && desc['type']==2){
+                   this.desc_statics.push(desc)
+               }
+            }
         }
     },
     mounted() {
+        this.getStatus(this.$route.path)
         this.getGoods()
+        this.sortData()
+    },
+     watch: {
+        '$route' (to, from) {
+            this.getStatus(this.$route.path)
+        }
     }
 }
 </script>

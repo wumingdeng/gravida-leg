@@ -41,16 +41,15 @@
                 <el-form-item label="货品名称">
                     <el-input v-model="form.name"></el-input>
                 </el-form-item>
-                <el-form-item v-if="isIn" label="货物颜色" >
-                    <el-select id = 'color' v-model="form.color" placeholder="请选择颜色" >
-                        <el-option v-for="(color,idx) in colors" :label="color" :value="idx" :key="idx"></el-option>
+                <el-form-item label="货物颜色" >
+                    <el-select v-model="form.color" multiple  placeholder="请选择颜色" >
+                        <el-option v-for="color in colors" :label="color.color" :value="color.color" :key="color.id"></el-option>
                     </el-select>
                 </el-form-item>
                 <el-form-item label="货品尺寸">
-                    <el-input v-model="form.size"></el-input>
-                </el-form-item>
-                <el-form-item label="备注">
-                    <el-input v-model="form.desc"></el-input>
+                    <el-select v-model="form.size" multiple  placeholder="请选择尺寸" >
+                        <el-option v-for="s in sizes" :label="s" :value="s" :key="s"></el-option>
+                    </el-select>
                 </el-form-item>
                 <el-form-item>
                     <el-button type="primary" @click="onSubmit">立即创建</el-button>
@@ -67,12 +66,14 @@ export default {
             form: {
                 name: '',
                 pid: '',
-                color: '',
-                size: ''
+                color: [],
+                size: []
             },
             filters: {
                 pid: ''
             },
+            colors: window.global.staticConfigs.color_configs,
+            sizes:['32','33','34','35','36','37','38','39','40','41','42','43','44','45'],
             tableData: [],
             listLoading: false,
             v_form: false,
@@ -115,6 +116,16 @@ export default {
             });
 
         },
+        refreshConfigs() {
+            this.$http.get(window.global.debugUrl+"getStorageConfigs").then((res)=>{
+                if(res.body.ok){
+                    window.global.staticConfigs = res.body.ok
+                    console.log(window.global.staticConfigs)
+                }  
+            },
+                (res)=>{
+                })
+        },
         onSubmit() {
             if (this.form.pid.toString().trim() == '') {
                 this.$alert('请输入货号');
@@ -134,10 +145,10 @@ export default {
                     this.$data.form = {
                         pid: "",
                         name: '',
-                        color: '',
-                        size: '',
-                        desc:''
+                        color: [],
+                        size: []
                     }
+                    this.refreshConfigs()
                 } else {
                     this.$alert('参数异常', '异常', {
                         confirmButtonText: '确定'
@@ -155,8 +166,8 @@ export default {
                 this.form.pid = row.pid
                 this.form.name = row.name
                 this.form.id = row.id
-                this.form.color = row.color
-                this.form.size = row.size
+                this.form.color = row.color.split(",")
+                this.form.size = row.size.split(",")
             } else {
                 delete this.form.id;
                 this.form.pid = ''

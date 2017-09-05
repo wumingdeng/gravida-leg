@@ -42,6 +42,16 @@
       };
     },
     methods: {
+      getConfigs() {
+        this.$http.get(g.debugUrl+"getStorageConfigs").then((res)=>{
+              if(res.body.ok){
+                window.global.staticConfigs = res.body.ok
+                console.log(window.global.staticConfigs)
+              }  
+          },
+            (res)=>{
+            })
+      },
       handleSubmit2(ev) {
         var _this = this;
         this.$refs.ruleForm2.validate((valid) => {
@@ -60,6 +70,7 @@
                     doctor_no:"1001"
                 }
                 setCookie('user', JSON.stringify(user));
+                this.getConfigs()
                 this.$router.push({name:'未付款记录'})
               } else if(res.body.ok == 0){
                   this.$alert('登陆失败', '警告', {
