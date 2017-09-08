@@ -3,7 +3,7 @@
         <div class="toolbar">
             <el-form :inline="true" :model="filters">
                 <el-form-item>
-                    <el-input v-model="filters.pid" placeholder="货号/货名"></el-input>
+                    <el-input v-model="filters.color" placeholder="颜色"></el-input>
                 </el-form-item>
                 <el-form-item>
                     <el-button type="primary" v-on:click="getConfigs(filters)">查询</el-button>
@@ -15,19 +15,13 @@
         </div>
         <el-row type="flex" align="middle" :gutter="20">
             <el-table v-loading="listLoading" :data="tableData" style="width: 100%">
-                <el-table-column prop="pid" label='货号' align='center'>
-                </el-table-column>
-                <el-table-column prop="name" label='货名' align='center'>
-                </el-table-column>
                 <el-table-column prop="color" label='颜色' align='center'>
-                </el-table-column>
-                <el-table-column prop="size" label='尺寸' align='center'>
                 </el-table-column>
                 <el-table-column label='操作' align='center'>
                     <template scope="scope">
                         <el-row>
                             <el-button size="small" type="primary" @click="onDelete(scope.$index, scope.row.id)">删除</el-button>
-                            <el-button size="small" type="primary" @click="onOpenDialog(scope.$index, scope.row)">修改</el-button>
+                            <el-button size="small" type="primary" @click="onOpenDialog(scope.row)">修改</el-button>
                         </el-row>
                     </template>
                 </el-table-column>
@@ -39,19 +33,8 @@
         </el-row>
         <el-dialog :visible.sync="v_form">
             <el-form ref="form" :model="form" label-width="80px">
-                <el-form-item label="货品号">
-                    <el-input v-model="form.pid"></el-input>
-                </el-form-item>
-                <el-form-item label="货品名称">
-                    <el-input v-model="form.name"></el-input>
-                </el-form-item>
                 <el-form-item label="颜色">
-                    <el-input v-model="form.color"></el-input><label style='color:#898989'>多个颜色","隔开</label>
-                </el-form-item>
-                <el-form-item label="货品尺寸">
-                    <el-select v-model="form.size" multiple  placeholder="请选择尺寸" >
-                        <el-option v-for="s in sizes" :label="s" :value="s" :key="s"></el-option>
-                    </el-select>
+                    <el-input v-model="form.color"></el-input>
                 </el-form-item>
                 <el-form-item>
                     <el-button type="primary" @click="onSubmit">立即创建</el-button>
@@ -66,16 +49,11 @@ export default {
     data() {
         return {
             form: {
-                name: '',
-                pid: '',
                 color: '',
-                size: []
             },
             filters: {
-                pid: ''
+                color: ''
             },
-            colors: window.global.staticConfigs.gravida_color_configs,
-            sizes:['32','33','34','35','36','37','38','39','40','41','42','43','44','45'],
             tableData: [],
             listLoading: false,
             v_form: false,
@@ -92,13 +70,13 @@ export default {
                 type: 'warning'
             }).then(() => {
                 console.log(_id)
-                this.$http.post(window.global.debugUrl + "delGoodsConfig", {id:_id}).then((res) => {
+                this.$http.post(window.global.debugUrl + "delColorConfig", {id:_id}).then((res) => {
                     if (res.body.ok) {
                         this.$message({
                             type: 'success',
                             message: '删除成功'
                         })
-                        window.global.staticConfigs.gravida_storage_configs = res.body.ok
+                        window.global.staticConfigs.gravida_color_configs = res.body.ok
                         this.$data.tableData.splice(_idx,1)
                     } else {
                         this.$alert('参数异常', '异常', {
@@ -119,40 +97,12 @@ export default {
             });
 
         },
-        refreshConfigs() {
-            this.$http.get(window.global.debugUrl+"getStorageConfigs").then((res)=>{
-                if(res.body.ok){
-                    window.global.staticConfigs = res.body.ok
-                }  
-            },
-                (res)=>{
-                })
-        },
         onSubmit() {
-            var regName =/[\u4e00-\u9fa5,/，]/g
-            if (this.form.pid.toString().trim() == '') {
-                this.$alert('请输入货号');
+            if (this.form.color.toString().trim() == '') {
+                this.$alert('请输入颜色');
                 return
             }
-            if (this.form.name.toString().trim() == '') {
-                this.$alert('请输入货品名称');
-                return
-            }
-            if(this.form.color.toString().replace(regName,'') != ''){
-                this.$alert('只能输入中文和逗号');
-                return
-            }
-            if(this.form.color.toString().trim()===''){
-                this.$alert('请选择颜色');
-                return
-            }
-            if(this.form.size.toString().trim()===''){
-                this.$alert('请选择尺寸');
-                return
-            }
-            this.$data.form.color = this.$data.form.color.replace(/，/g,',')
-            console.log(this.$data.form.color)
-            this.$http.post(window.global.debugUrl + "saveGoodsConfig", this.$data.form).then((res) => {
+            this.$http.post(window.global.debugUrl + "saveColorConfig", this.$data.form).then((res) => {
                 if (res.body.ok) {
                     this.$message({
                         type: 'success',
@@ -160,13 +110,9 @@ export default {
                     })
                     this.$data.v_form = false
                     this.$data.form = {
-                        pid: "",
-                        name: '',
                         color: '',
-                        size: []
                     }
-                    window.global.staticConfigs.gravida_storage_configs = res.body.ok
-                    this.refreshConfigs()
+                    window.global.staticConfigs.gravida_color_configs = res.body.ok
                 } else {
                     this.$alert('参数异常', '异常', {
                         confirmButtonText: '确定'
@@ -179,19 +125,12 @@ export default {
                     this.$data.listLoading = false
                 })
         },
-        onOpenDialog(index, row) {
+        onOpenDialog(row) {
             if (row) {
-                this.form.pid = row.pid
-                this.form.name = row.name
-                this.form.id = row.id
                 this.form.color = row.color
-                this.form.size = row.size.split(",")
             } else {
                 delete this.form.id;
-                this.form.pid = ''
-                this.form.name = ''
                 this.form.color = ''
-                this.form.size = []
             }
             this.v_form = true
         },
@@ -204,13 +143,13 @@ export default {
             this.getConfigs()
         },
         getConfigs(_filter) {
+            this.$data.tableData = []
             this.$data.listLoading = true
             var pos = {
                 offset: (this.$data.curPage - 1) * this.$data.pageSize,
                 limit: this.$data.pageSize,
             }
-            if (_filter) pos.v = _filter
-            this.$http.post(window.global.debugUrl + "getGoodsConfig", pos).then((res) => {
+            this.$http.post(window.global.debugUrl + "getColorConfigs",pos).then((res) => {
                 if (res.body.d) {
                     this.$data.total = res.body.d.count;
                     this.$data.tableData = res.body.d.rows;
@@ -225,18 +164,8 @@ export default {
                     this.$data.listLoading = false
                 })
         },
-         getStaticConfigs() {
-            this.$http.get(window.global.debugUrl + "getStorageConfigs").then((res) => {
-                if (res.body.ok) {
-                    window.global.staticConfigs = res.body.ok
-                }
-            },
-                (res) => {
-                })
-        },
     },
     mounted(){
-        this.getStaticConfigs()
         this.getConfigs()
     }
 }

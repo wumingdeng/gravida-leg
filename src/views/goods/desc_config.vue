@@ -3,7 +3,13 @@
         <div class="toolbar">
             <el-form :inline="true" :model="filters">
                 <el-form-item>
-                    <el-input v-model="filters.pid" placeholder="货号/货名"></el-input>
+                    <el-input v-model="filters.desc" placeholder="关键词"></el-input>
+                </el-form-item>
+                <el-form-item>
+                    <el-select v-model="filters.type" placeholder="入库/出库">
+                        <el-option label="入库" value="1"></el-option>
+                        <el-option label="出库" value="2"></el-option>
+                    </el-select>
                 </el-form-item>
                 <el-form-item>
                     <el-button type="primary" v-on:click="getConfigs(filters)">查询</el-button>
@@ -15,18 +21,14 @@
         </div>
         <el-row type="flex" align="middle" :gutter="20">
             <el-table v-loading="listLoading" :data="tableData" style="width: 100%">
-                <el-table-column prop="pid" label='货号' align='center'>
+                <el-table-column prop="type" label='类型' align='center' :formatter="typeFormatter">
                 </el-table-column>
-                <el-table-column prop="name" label='货名' align='center'>
-                </el-table-column>
-                <el-table-column prop="color" label='颜色' align='center'>
-                </el-table-column>
-                <el-table-column prop="size" label='尺寸' align='center'>
+                <el-table-column prop="desc" label='原因' align='center'>
                 </el-table-column>
                 <el-table-column label='操作' align='center'>
                     <template scope="scope">
                         <el-row>
-                            <el-button size="small" type="primary" @click="onDelete(scope.$index, scope.row.id)">删除</el-button>
+                            <el-button size="small" type="primary" @click="onDelete(scope.$index, scope.row)">删除</el-button>
                             <el-button size="small" type="primary" @click="onOpenDialog(scope.$index, scope.row)">修改</el-button>
                         </el-row>
                     </template>
@@ -39,19 +41,14 @@
         </el-row>
         <el-dialog :visible.sync="v_form">
             <el-form ref="form" :model="form" label-width="80px">
-                <el-form-item label="货品号">
-                    <el-input v-model="form.pid"></el-input>
-                </el-form-item>
-                <el-form-item label="货品名称">
-                    <el-input v-model="form.name"></el-input>
-                </el-form-item>
-                <el-form-item label="颜色">
-                    <el-input v-model="form.color"></el-input><label style='color:#898989'>多个颜色","隔开</label>
-                </el-form-item>
-                <el-form-item label="货品尺寸">
-                    <el-select v-model="form.size" multiple  placeholder="请选择尺寸" >
-                        <el-option v-for="s in sizes" :label="s" :value="s" :key="s"></el-option>
+                <el-form-item label="类型">
+                    <el-select v-model="form.type"  placeholder="入库/出库" >
+                        <el-option label="入库" value="1"></el-option>
+                        <el-option label="出库" value="2"></el-option>
                     </el-select>
+                </el-form-item>
+                <el-form-item label="原因">
+                    <el-input v-model="form.desc"></el-input>
                 </el-form-item>
                 <el-form-item>
                     <el-button type="primary" @click="onSubmit">立即创建</el-button>
@@ -66,40 +63,62 @@ export default {
     data() {
         return {
             form: {
-                name: '',
-                pid: '',
-                color: '',
-                size: []
+                type: '1',
+                index: '',
+                desc: ''
             },
             filters: {
-                pid: ''
+                type: '',
+                desc: ''
             },
-            colors: window.global.staticConfigs.gravida_color_configs,
-            sizes:['32','33','34','35','36','37','38','39','40','41','42','43','44','45'],
             tableData: [],
             listLoading: false,
             v_form: false,
             curPage: 1,
             pageSize: 10,
             total: 10,
+            in_max_index:0,
+            out_max_index:0,
         }
     },
     methods: {
-        onDelete(_idx,_id) {
+        //顺便统计了下每个行为的最高的索引数目
+        typeFormatter(row, column){
+            var type= row.type
+            if(type == 1){
+                if(row.index>this.in_max_index){
+                    this.in_max_index = row.index
+                }
+                return '入库'
+            }else{
+                if(row.index>this.out_max_index){
+                    this.out_max_index = row.index
+                }
+                return '出库'
+            }
+        },
+        onDelete(_idx,row) {
+            var _id = row.id
+            var _type = row.type
+            var _idx = row.index
             this.$confirm('是否删除该配置条目, 是否继续?', '提示', {
                 confirmButtonText: '确定',
                 cancelButtonText: '取消',
                 type: 'warning'
             }).then(() => {
                 console.log(_id)
-                this.$http.post(window.global.debugUrl + "delGoodsConfig", {id:_id}).then((res) => {
+                this.$http.post(window.global.debugUrl + "delDescConfig", {id:_id,type:_type,index:_idx}).then((res) => {
                     if (res.body.ok) {
                         this.$message({
                             type: 'success',
                             message: '删除成功'
                         })
-                        window.global.staticConfigs.gravida_storage_configs = res.body.ok
                         this.$data.tableData.splice(_idx,1)
+                         window.global.staticConfigs.gravida_desc_configs = res.body.ok
+                    }else if(res.body.err === 0){
+                        this.$alert("当前配置已有记录生成,无法删除", '提示', {
+                            confirmButtonText: '确定'
+                        });
                     } else {
                         this.$alert('参数异常', '异常', {
                             confirmButtonText: '确定'
@@ -119,40 +138,17 @@ export default {
             });
 
         },
-        refreshConfigs() {
-            this.$http.get(window.global.debugUrl+"getStorageConfigs").then((res)=>{
-                if(res.body.ok){
-                    window.global.staticConfigs = res.body.ok
-                }  
-            },
-                (res)=>{
-                })
-        },
         onSubmit() {
-            var regName =/[\u4e00-\u9fa5,/，]/g
-            if (this.form.pid.toString().trim() == '') {
-                this.$alert('请输入货号');
+            if (this.form.desc.toString().trim() == '') {
+                this.$alert('原因');
                 return
             }
-            if (this.form.name.toString().trim() == '') {
-                this.$alert('请输入货品名称');
-                return
+            if(this.$data.form.type=='1'){
+                this.$data.form.index = this.in_max_index
+            }else{
+                this.$data.form.index = this.out_max_index
             }
-            if(this.form.color.toString().replace(regName,'') != ''){
-                this.$alert('只能输入中文和逗号');
-                return
-            }
-            if(this.form.color.toString().trim()===''){
-                this.$alert('请选择颜色');
-                return
-            }
-            if(this.form.size.toString().trim()===''){
-                this.$alert('请选择尺寸');
-                return
-            }
-            this.$data.form.color = this.$data.form.color.replace(/，/g,',')
-            console.log(this.$data.form.color)
-            this.$http.post(window.global.debugUrl + "saveGoodsConfig", this.$data.form).then((res) => {
+            this.$http.post(window.global.debugUrl + "saveDescConfig", this.$data.form).then((res) => {
                 if (res.body.ok) {
                     this.$message({
                         type: 'success',
@@ -160,13 +156,11 @@ export default {
                     })
                     this.$data.v_form = false
                     this.$data.form = {
-                        pid: "",
-                        name: '',
-                        color: '',
-                        size: []
+                        desc: '',
+                        type: ''
                     }
-                    window.global.staticConfigs.gravida_storage_configs = res.body.ok
-                    this.refreshConfigs()
+                    console.log(res.body.ok)
+                    window.global.staticConfigs.gravida_desc_configs = res.body.ok
                 } else {
                     this.$alert('参数异常', '异常', {
                         confirmButtonText: '确定'
@@ -181,17 +175,13 @@ export default {
         },
         onOpenDialog(index, row) {
             if (row) {
-                this.form.pid = row.pid
-                this.form.name = row.name
                 this.form.id = row.id
-                this.form.color = row.color
-                this.form.size = row.size.split(",")
+                this.form.desc = row.desc
+                this.form.type = row.type.toString()
             } else {
                 delete this.form.id;
-                this.form.pid = ''
-                this.form.name = ''
-                this.form.color = ''
-                this.form.size = []
+                this.form.desc = ''
+                this.form.type = '1'
             }
             this.v_form = true
         },
@@ -210,7 +200,7 @@ export default {
                 limit: this.$data.pageSize,
             }
             if (_filter) pos.v = _filter
-            this.$http.post(window.global.debugUrl + "getGoodsConfig", pos).then((res) => {
+            this.$http.post(window.global.debugUrl + "getDescConfigs", pos).then((res) => {
                 if (res.body.d) {
                     this.$data.total = res.body.d.count;
                     this.$data.tableData = res.body.d.rows;
@@ -219,13 +209,17 @@ export default {
                         confirmButtonText: '确定'
                     });
                 }
+                this.filters = {
+                        desc: '',
+                        type: ''
+                }
                 this.$data.listLoading = false
             },
                 (res) => {
                     this.$data.listLoading = false
                 })
         },
-         getStaticConfigs() {
+        getStaticConfigs() {
             this.$http.get(window.global.debugUrl + "getStorageConfigs").then((res) => {
                 if (res.body.ok) {
                     window.global.staticConfigs = res.body.ok

@@ -18,43 +18,33 @@
         </div>
         <el-dialog　:visible.sync="form_visible" :title="isIn?'入库操作':'出库操作'">
             <el-form ref="form" :model="form" :rules="formrules" label-width="80px">
-            <el-form-item label="货号" >
-                <el-select
-                    v-model="form.pid"
-                    filterable
-                    remote
-                    placeholder="请输入关键字"
-                    :remote-method="remoteMethod"
-                    :loading="loading"
-                    @change="onSelected">
-                    <el-option
-                    v-for="item in options4"
-                    :key="item.value"
-                    :label="item.label"
-                    :value="item.value">
-                    </el-option>
-                </el-select>
-                 </el-form-item>
-                <el-form-item label="尺码" >
-                    <el-select id = 'color' v-model="form.size" placeholder="请选择尺寸" >
+                <el-form-item label="货号">
+                    <el-select v-model="form.pid" filterable remote placeholder="请输入关键字" :remote-method="remoteMethod" :loading="loading" @change="onSelected">
+                        <el-option v-for="item in options4" :key="item.value" :label="item.label" :value="item.value">
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="尺码">
+                    <el-select id='color' v-model="form.size" placeholder="请选择尺寸">
                         <el-option v-for="s in sizes" :label="s" :value="s" :key="s"></el-option>
                     </el-select>
                 </el-form-item>
                 <el-form-item label="数量">
                     <el-input v-model="form.amount"></el-input>
                 </el-form-item>
-                <el-form-item label="货物颜色" >
-                    <el-select id = 'color' v-model="form.color" placeholder="请选择颜色" >
+                
+                <el-form-item label="货物颜色">
+                    <el-select id='color' v-model="form.color" placeholder="请选择颜色">
                         <el-option v-for="co in colors" :label="co" :value="co" :key="co"></el-option>
                     </el-select>
                 </el-form-item>
-                <el-form-item label="原因" >
+                <el-form-item label="原因">
                     <el-radio-group v-model="form.desc">
-                        <el-radio v-for="desc in desc_statics" :key="desc.index" :label="desc.desc">{{desc.desc}}</el-radio>
+                        <el-radio v-for="desc in desc_statics" :key="desc.index" :label="desc.index">{{desc.desc}}</el-radio>
                     </el-radio-group>
                 </el-form-item>
                 <el-form-item label="备注">
-                    <el-input v-model="form.desc_con"></el-input>
+                    <el-input type="textarea" v-model="form.desc_con"></el-input>
                 </el-form-item>
                 <el-form-item>
                     <el-button type="primary" @click="onSubmit">确认</el-button>
@@ -66,7 +56,10 @@
                 <el-table v-loading="listLoading" :data="tableData" style="width: 100%">
                     <el-table-column prop="pid" label='货号' align='center'>
                     </el-table-column>
-                    <el-table-column prop="name" label='货名' align='center'>
+                    <el-table-column label='货名' align='center'>
+                        <template scope="scope">
+                            {{scope.row.gravida_storage_config.name}}
+                        </template>
                     </el-table-column>
                     <el-table-column width='80' prop="color" label='颜色' align='center'>
                     </el-table-column>
@@ -101,19 +94,19 @@ export default {
                 name: '',
                 amount: '',
                 color: '',
-                desc_con:'',
+                desc_con: '',
                 desc: ''
             },
             filters: {
                 pid: ''
             },
-            options4:[],
-            colors:[],
-            sizes:[],
-            storages: window.global.staticConfigs.storage_configs,
-            desc_statics:[],
-            list:[],
-            loading:false,
+            options4: [],
+            colors: [],
+            sizes: [],
+            storages: [],
+            desc_statics: [],
+            list: [],
+            loading: false,
             form_visible: false,
             out_visible: false,
             listLoading: false,
@@ -148,24 +141,24 @@ export default {
     },
     methods: {
         onSelected(value) {
-            if(value=='') return
-            console.log("ADFASD"+value)
+            if (value == '') return
             var storage = this.storages[value]
             this.sizes = storage.size.split(',')
-            this.colors = storage.color.split(',')
+            this.colors = storage.color.split(",");
+            console.log(this.colors)
         },
         remoteMethod(query) {
             if (query !== '') {
-            this.loading = true;
-            setTimeout(() => {
-                this.loading = false;
-                this.options4 = this.list.filter(item => {
-                return item.label.toLowerCase()
-                    .indexOf(query.toLowerCase()) > -1;
-                });
-            }, 200);
+                this.loading = true;
+                setTimeout(() => {
+                    this.loading = false;
+                    this.options4 = this.list.filter(item => {
+                        return item.label.toLowerCase()
+                            .indexOf(query.toLowerCase()) > -1;
+                    });
+                }, 200);
             } else {
-            this.options4 = [];
+                this.options4 = [];
             }
         },
         onSubmit() {
@@ -181,7 +174,7 @@ export default {
             if (this.form.size.toString().trim() == '') {
                 this.$alert('请输入尺寸');
                 return
-            }else{
+            } else {
                 if (!re.test(this.form.size)) {
                     this.$alert('尺寸必须为数字');
                     return
@@ -190,24 +183,24 @@ export default {
             if (this.form.amount.toString().trim() == '') {
                 this.$alert('请输入数量');
                 return
-            }else{
+            } else {
                 if (!re.test(this.form.amount)) {
                     this.$alert('数量必须为数字');
                     return
                 }
             }
-            if (this.form.desc == '') {
+            if (this.form.desc === '') {
                 this.$alert('请选择入库理由');
                 return
             }
             this.$refs.form.validate((valid) => {
                 if (valid) {
-                    var url=""
-                    if(!this.isIn){
-                        this.$data.form.amount = -Number(this.$data.form.amount)
-                        console.log(this.$data.form.amount)
+                    var url = ""
+                    var posData = Object.assign({},this.$data.form)
+                    if (!this.isIn) {
+                        posData.amount = -Number(this.$data.form.amount)
                     }
-                    this.$http.post(window.global.debugUrl + "saveGoods", this.$data.form).then((res) => {
+                    this.$http.post(window.global.debugUrl + "saveGoods", posData).then((res) => {
                         if (res.body.ok == 1) {
                             this.$message({
                                 type: 'success',
@@ -217,13 +210,13 @@ export default {
                             this.$data.form = {
                                 pid: "",
                                 name: '',
-                                amount:'',
+                                amount: '',
                                 color: '',
                                 size: '',
-                                desc_con:'',
+                                desc_con: '',
                                 desc: ''
                             }
-                        } else if(res.body.ok == 0){
+                        } else if (res.body.ok == 0) {
                             this.$alert('库存不足', '提示', {
                                 confirmButtonText: '确定'
                             });
@@ -250,7 +243,7 @@ export default {
                 offset: (this.$data.curPage - 1) * this.$data.pageSize,
                 limit: this.$data.pageSize,
             }
-            if(_filter) pos.v = _filter
+            if (_filter) pos.v = _filter
             this.$http.post(window.global.debugUrl + "getStorages", pos).then((res) => {
                 if (res.body.d) {
                     this.$data.total = res.body.d.count;
@@ -276,15 +269,13 @@ export default {
             this.form.desc = ''
             this.form.desc_con = ''
             this.form_visible = true
-           
             if (row) {
                 this.form.pid = row.pid
                 this.form.name = row.name
                 this.form.size = row.size
                 this.form.color = row.color
                 this.form.desc = row.desc
-                if(this.isIn){ // 修改
-                    console.log(row.id)
+                if (this.isIn) { // 修改
                     this.form.desc_con = row.desc_con
                     this.form.amount = row.amount
                     this.form.id = row.id
@@ -317,16 +308,28 @@ export default {
         handleChange(self) {
             self.value = self.value.replace(/\D/gi, "")
         },
-        getStatus(path){
-             if(path=="/in_storage"){
+        getStatus(path) {
+            if (path == "/in_storage") {
                 this.isIn = true
-             }else if(path=="/out_storage"){
-                 this.isIn = false
-             }
+            } else if (path == "/out_storage") {
+                this.isIn = false
+            }
+            var descs = window.global.staticConfigs.gravida_desc_configs
+            this.desc_statics = []
+            for (var key in descs) {
+                var desc = descs[key]
+                if (this.isIn && desc['type'] == 1) {
+                    this.desc_statics.push(desc)
+                } else if (!this.isIn && desc['type'] == 2) {
+                    this.desc_statics.push(desc)
+                }
+            }
         },
-        sortData(){
+        sortData() {
+            this.storages = window.global.staticConfigs.gravida_storage_configs
             var states = []
-            for(var key in this.storages){
+            console.log(this.storages.pid)
+            for (var key in this.storages) {
                 var s = this.storages[key]
                 states.push(s['pid'])
             }
@@ -334,24 +337,26 @@ export default {
                 return { value: item, label: item };
             });
 
-            var descs = window.global.staticConfigs.desc_configs
-            for(var key in descs){
-               var desc = descs[key]
-               if(this.isIn && desc['type']==1){
-                   this.desc_statics.push(desc)
-               }else if(!this.isIn && desc['type']==2){
-                   this.desc_statics.push(desc)
-               }
-            }
-        }
+
+        },
+        getConfigs() {
+            this.$http.get(window.global.debugUrl + "getStorageConfigs").then((res) => {
+                if (res.body.ok) {
+                    window.global.staticConfigs = res.body.ok
+                    this.sortData()
+                }
+            },
+                (res) => {
+                })
+        },
     },
     mounted() {
         this.getStatus(this.$route.path)
+        this.getConfigs()
         this.getGoods()
-        this.sortData()
     },
-     watch: {
-        '$route' (to, from) {
+    watch: {
+        '$route'(to, from) {
             this.getStatus(this.$route.path)
         }
     }

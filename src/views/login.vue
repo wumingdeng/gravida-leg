@@ -46,7 +46,6 @@
         this.$http.get(g.debugUrl+"getStorageConfigs").then((res)=>{
               if(res.body.ok){
                 window.global.staticConfigs = res.body.ok
-                console.log(window.global.staticConfigs)
               }  
           },
             (res)=>{

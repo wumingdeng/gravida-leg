@@ -13,7 +13,7 @@
                 </el-form-item>
                 <el-form-item>
                     <el-select v-model="filters.desc" placeholder="请选择行为">
-                        <el-option v-for="(item,idx) in desc" :key="idx" :label="item" :value="idx">
+                        <el-option v-for="(item,idx) in option_descs" :key="idx" :label="item" :value="idx">
                         </el-option>
                     </el-select>
                 </el-form-item>
@@ -26,13 +26,20 @@
             <el-table v-loading="listLoading" :data="tableData" style="width: 100%">
                 <el-table-column prop="pid" label='货号' align='center'>
                 </el-table-column>
-                <el-table-column prop="name" label='货名' align='center'>
+                <el-table-column label='货名' align='center'>
+                    <template scope="scope">
+                            {{scope.row.gravida_storage_config.name}}
+                        </template>
                 </el-table-column>
                 <el-table-column  width='100' prop="amount" label='数量' align='center'>
                 </el-table-column>
-                <el-table-column prop="desc" label='备注' :formatter="desc_formatter" align='center'>
+                <el-table-column  width='100' prop="color" label='颜色' align='center'>
                 </el-table-column>
-                <el-table-column prop="desc_con" label='备注' :formatter="desc_formatter" align='center'>
+                <el-table-column  width='100' prop="size" label='尺寸' align='center'>
+                </el-table-column>
+                <el-table-column prop="desc" label='原因' :formatter="desc_formatter" align='center'>
+                </el-table-column>
+                <el-table-column prop="desc_con" label='备注' align='center'>
                 </el-table-column>
                 <el-table-column label='执行时间' align='center' prop="createtime" :formatter="createdateformatter">
                 </el-table-column>
@@ -52,7 +59,6 @@
     </div>
 </template>
 <script>
-import storage from "../../../storage.json";
 export default {
     data() {
         return {
@@ -61,12 +67,14 @@ export default {
                 desc: '',
                 type: ''
             },
-            desc:{},
+            option_descs:{},
             listLoading: false,
             tableData: [],
             curPage: 1,
             pageSize: 10,
             total: 10,
+            in_desc:{},
+            out_desc:{},
         }
     },
     methods: {
@@ -95,9 +103,10 @@ export default {
         selectType(value) {
             this.filters.desc = ''
             if (value == 1) {
-                this.desc = storage.in
+                this.option_descs = this.in_desc
+                console.log(this.option_descs)
             } else {
-                this.desc = storage.out
+                this.option_descs = this.out_desc
             }
         },
         handle_setPageSize(pageSize) {
@@ -111,22 +120,42 @@ export default {
         createdateformatter(row, column) {
             var value = row.createtime
             var unixTimestamp = new Date(value * 1000);
-            // var curTime = unixTimestamp.Format("yyyy-MM-dd");
-            
-            // return curTime;
             return unixTimestamp.toLocaleString();
         },
         desc_formatter(row, column) {
             var value = row.desc
             if(row.type == 1){
-                return storage.in[value]
+                return this.in_desc[value]
             }else{
-                return storage.out[value]
+                return this.out_desc[value]
             }
-            
-        }
+        },
+        sortStaicData(){
+            this.in_desc=[]
+            this.out_desc=[]
+            var descs = window.global.staticConfigs.gravida_desc_configs
+            for(var key in descs){
+               var desc = descs[key]
+               if(desc['type']==1){
+                   this.in_desc[desc.index] = desc.desc
+               }else{
+                   this.out_desc[desc.index] = desc.desc
+               }
+            }
+        },
+        getConfigs() {
+            this.$http.get(window.global.debugUrl + "getStorageConfigs").then((res) => {
+                if (res.body.ok) {
+                    window.global.staticConfigs = res.body.ok
+                    this.sortStaicData()
+                }
+            },
+                (res) => {
+                })
+        },
     },
     mounted() {
+        this.getConfigs()
         this.getGoods()
     }
 }

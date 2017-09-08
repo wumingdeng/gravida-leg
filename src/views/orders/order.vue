@@ -45,16 +45,15 @@
         </el-table-column>
       <el-table-column label='操作' align='center'>
             <template scope="scope">
-                <el-row>{{statusName[scope.row.status]}}</el-row>
                 <el-row>
                  <el-button
                     v-if="scope.row.status == 1" 
                     size="small"
-                    @click="open2(scope.$index, scope.row)">备货</el-button>
+                    @click="open2(scope.$index, scope.row)">开始备货</el-button>
                 <el-button
                     v-else-if="scope.row.status == 2" 
                     size="small"
-                    @click="open2(scope.$index, scope.row)">发货</el-button>
+                    @click="open2(scope.$index, scope.row)">开始发货</el-button>
                 <el-button
                     v-else-if="scope.row.status == 3" 
                     size="small"
@@ -179,16 +178,15 @@ export default {
         if(this.$data.change){
             st = row.status
         }else{
-            st = ++row.status
+            st = row.status+1
         }
         var pos={id:row.id,status:st}
-        if(row.status==3){
+        if(row.status==2){
             pos.com_no = this.$data.expForm.no
             pos.exp_order_no = this.$data.expForm.name 
         }
         console.log(pos.com_no + " : "+ pos.id+ " : "+ pos.exp_order_no)
         this.$http.post(g.debugUrl+"updateOrders",pos).then((res)=>{
-            console.log(res)
             if(res.body.ok == -2){
                 this.$alert('session过期', '异常', {
                 confirmButtonText: '确定'
@@ -260,11 +258,13 @@ export default {
           var postData = {
               offset:(this.$data.curPage-1)*this.$data.pageSize,
               limit:this.$data.pageSize,
-              status:status
+              status:this.status
           }
           this.$http.post(g.debugUrl+"getOrders",postData).then((res)=>{
-              this.$data.total = res.body.d.count;
-              this.$data.tableData = res.body.d.rows;  
+              if(res.body.d){
+                 this.$data.total = res.body.d.count;
+                this.$data.tableData = res.body.d.rows;  
+              }
               this.$data.listLoading = false    
           },
           (res)=>{
@@ -281,11 +281,12 @@ export default {
       },
       open2(idx,row) {
           this.$data.change = false
-          if(status==2){
+          console.log("status:"+this.status)
+          if(this.status==2){
               this.$data.dialogFormVisible = true
               this.$data.expForm.idx = idx
               this.$data.expForm.row = row
-          }else if(status==3){
+          }else if(this.status==3){
             //   var pos={expNo:3953420657949,expCode:"YD"}
             var pos = {
                 expNo:row.exp_no,
@@ -323,7 +324,8 @@ export default {
             (res)=>{
                 this.$data.listLoading = false      
             })
-              
+          }else if(this.status === 0){
+            return 
           }else{
             this.$confirm('是否修改该订单的状态, 是否继续?', '提示', {
                 confirmButtonText: '确定',
@@ -348,8 +350,14 @@ export default {
               v:this.$data.filters.name,
           }
           this.$http.post(g.debugUrl+"getOrdersBylike",postData).then((res)=>{
-              this.$data.total = res.body.d.count;
-              this.$data.tableData = res.body.d.rows;  
+              if(res.body.d){
+                    this.$data.total = res.body.d.count;
+                    this.$data.tableData = res.body.d.rows;  
+               }else{
+                   this.$alert("数据获取异常", '异常', {
+                            confirmButtonText: '确定'
+                        });
+               }
               this.$data.listLoading = false    
           },
           (res)=>{
@@ -358,23 +366,23 @@ export default {
       },
       getStatus(path){
           switch(path){
-              case "/home":
-                status = 0
+              case "/weifukuan":
+                this.status = 0
               break;
               case "/fukuan":
-                status = 1
+                this.status = 1
               break;
               case "/weishouhuo":
-                status = 2
+                this.status = 2
               break;
               case "/shouhuo":
-                status = 3
+                this.status = 3
               break;
               default:
-                status = 4
+                this.status = 4
               break
           }
-          eventBus.$emit("onselectedOrder",status)
+          eventBus.$emit("onselectedOrder",this.status)
       }
     },
    mounted (){
