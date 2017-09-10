@@ -13,12 +13,12 @@
                 </el-form-item>
                 <el-form-item>
                     <el-select v-model="filters.desc" placeholder="请选择行为">
-                        <el-option v-for="(item,idx) in option_descs" :key="idx" :label="item" :value="idx">
+                        <el-option v-for="(item,idx) in option_descs" :key="idx" :label="item.desc" :value="item.idx">
                         </el-option>
                     </el-select>
                 </el-form-item>
                 <el-form-item>
-                    <el-button type="primary" v-on:click="getGoods(filters)">查询</el-button>
+                    <el-button type="primary" v-on:click="getGoods()">查询</el-button>
                 </el-form-item>
             </el-form>
         </div>
@@ -75,16 +75,18 @@ export default {
             total: 10,
             in_desc:{},
             out_desc:{},
+            txt_in_desc:{},
+            txt_out_desc:{},
         }
     },
     methods: {
-        getGoods(_filter) {
+        getGoods() {
             this.$data.listLoading = true
             var pos = {
                 offset: (this.$data.curPage - 1) * this.$data.pageSize,
                 limit: this.$data.pageSize,
+                v:this.filters
             }
-            if(_filter) pos.v = _filter
             this.$http.post(window.global.debugUrl + "getStorage_records", pos).then((res) => {
                 if (res.body.d) {
                     this.$data.total = res.body.d.count;
@@ -111,11 +113,11 @@ export default {
         },
         handle_setPageSize(pageSize) {
             this.$data.pageSize = pageSize
-            this.findByPage()
+            this.getGoods()
         },
         handle_setCurPage(currentPage) {
             this.$data.curPage = currentPage
-            this.findByPage()
+            this.getGoods()
         },
         createdateformatter(row, column) {
             var value = row.createtime
@@ -125,9 +127,9 @@ export default {
         desc_formatter(row, column) {
             var value = row.desc
             if(row.type == 1){
-                return this.in_desc[value]
+                return this.txt_in_desc[value]
             }else{
-                return this.out_desc[value]
+                return this.txt_out_desc[value]
             }
         },
         sortStaicData(){
@@ -137,9 +139,11 @@ export default {
             for(var key in descs){
                var desc = descs[key]
                if(desc['type']==1){
-                   this.in_desc[desc.index] = desc.desc
+                   this.txt_in_desc[desc.index] = desc.desc
+                   this.in_desc.push({idx:desc.index,desc:desc.desc})
                }else{
-                   this.out_desc[desc.index] = desc.desc
+                   this.txt_out_desc[desc.index] = desc.desc
+                   this.out_desc.push({idx:desc.index,desc:desc.desc})
                }
             }
         },

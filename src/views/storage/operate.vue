@@ -6,7 +6,7 @@
                     <el-input v-model="filters.pid" placeholder="货号"></el-input>
                 </el-form-item>
                 <el-form-item>
-                    <el-button type="primary" v-on:click="getGoods(filters)">查询</el-button>
+                    <el-button type="primary" v-on:click="getGoods()">查询</el-button>
                 </el-form-item>
                 <el-form-item v-if="isIn">
                     <el-button type="primary" v-on:click="onOperate()">入库</el-button>
@@ -237,13 +237,13 @@ export default {
             });
 
         },
-        getGoods(_filter) {
+        getGoods() {
             this.$data.listLoading = true
             var pos = {
                 offset: (this.$data.curPage - 1) * this.$data.pageSize,
                 limit: this.$data.pageSize,
+                v:this.filters
             }
-            if (_filter) pos.v = _filter
             this.$http.post(window.global.debugUrl + "getStorages", pos).then((res) => {
                 if (res.body.d) {
                     this.$data.total = res.body.d.count;
@@ -291,16 +291,12 @@ export default {
             this.getGoods()
         },
         createdateformatter(row, column) {
-            var value = row.createdAt
-            if (value) {
-                var data = value.split('T')[0]
-                var time = value.split('T')[1]
-                time = time.split('.')[0]
-                time = time.substring(0, 5)
-                return data + " " + time
-            } else {
-                return ""
-            }
+            var value = row.updatedAt
+            // return value
+            var timestamp = Number(Date.parse(new Date(value))) + (8*3600)
+           
+            return  new Date(timestamp).toLocaleString();
+           
         },
         onDelete() {
 

@@ -205,6 +205,8 @@ export default {
                 message: '订单状态修改成'})
                 if(!this.$data.change){
                     this.$data.tableData.splice(idx,1)
+                    this.total -= 1 
+                    this.onUpdateNavCount()
                 }else{
                     row.exp_com_no = this.$data.expForm.no
                     row.exp_no = this.$data.expForm.name
@@ -382,11 +384,15 @@ export default {
                 this.status = 4
               break
           }
-          eventBus.$emit("onselectedOrder",this.status)
+      },
+      //更新导航栏的计数
+      onUpdateNavCount() {
+          console.log("当前数目："+this.total)
+          eventBus.$emit("onselectedOrder",{st:this.status,count:this.total})
       }
     },
    mounted (){
-       this.getStatus(this.$route.path)
+    //    this.getStatus(this.$route.path)
        this.findByPage()
    },
    watch: {

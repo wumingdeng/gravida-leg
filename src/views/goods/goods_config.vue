@@ -6,7 +6,7 @@
                     <el-input v-model="filters.pid" placeholder="货号/货名"></el-input>
                 </el-form-item>
                 <el-form-item>
-                    <el-button type="primary" v-on:click="getConfigs(filters)">查询</el-button>
+                    <el-button type="primary" v-on:click="getConfigs()">查询</el-button>
                 </el-form-item>
                 <el-form-item>
                     <el-button type="primary" v-on:click="onOpenDialog()">添加</el-button>
@@ -203,13 +203,13 @@ export default {
             this.$data.curPage = currentPage
             this.getConfigs()
         },
-        getConfigs(_filter) {
+        getConfigs() {
             this.$data.listLoading = true
             var pos = {
                 offset: (this.$data.curPage - 1) * this.$data.pageSize,
                 limit: this.$data.pageSize,
+                v:this.filters
             }
-            if (_filter) pos.v = _filter
             this.$http.post(window.global.debugUrl + "getGoodsConfig", pos).then((res) => {
                 if (res.body.d) {
                     this.$data.total = res.body.d.count;

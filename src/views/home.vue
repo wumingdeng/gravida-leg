@@ -168,19 +168,22 @@ export default {
         }
     },
     mounted() {
-        eventBus.$on("onselectedOrder", function(status) {
+        eventBus.$on("onselectedOrder", function(arg) {
+            console.log("剩余"+arg)
+            var status = arg.st
+            var count = arg.count
             switch (status) {
                 case 0:
-                    this.$data.s1_cout = 0
+                    this.$data.s1_cout = count
                     break;
                 case 1:
-                    this.$data.s2_cout = 0
+                    this.$data.s2_cout = count
                     break;
                 case 2:
-                    this.$data.s3_cout = 0
+                    this.$data.s3_cout = count
                     break;
                 case 3:
-                    this.$data.s4_cout = 0
+                    this.$data.s4_cout = count
                     break;
                 default:
                     break
