@@ -310,6 +310,8 @@ export default {
             } else if (path == "/out_storage") {
                 this.isIn = false
             }
+            this.curPage = 1
+            this.pageSize= 10
             var descs = window.global.staticConfigs.gravida_desc_configs
             this.desc_statics = []
             for (var key in descs) {
@@ -353,6 +355,7 @@ export default {
     },
     watch: {
         '$route'(to, from) {
+            this.filters.pid = ''
             this.getStatus(this.$route.path)
         }
     }

@@ -175,12 +175,15 @@ export default {
             switch (status) {
                 case 0:
                     this.$data.s1_cout = count
+                    this.$data.s2_cout++
                     break;
                 case 1:
                     this.$data.s2_cout = count
+                    this.$data.s3_cout++
                     break;
                 case 2:
                     this.$data.s3_cout = count
+                    this.$data.s4_cout++
                     break;
                 case 3:
                     this.$data.s4_cout = count

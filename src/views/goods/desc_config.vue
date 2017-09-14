@@ -100,14 +100,14 @@ export default {
         onDelete(_idx,row) {
             var _id = row.id
             var _type = row.type
-            var _idx = row.index
+            var _index= row.index
+            console.log("下标："+_idx)
             this.$confirm('是否删除该配置条目, 是否继续?', '提示', {
                 confirmButtonText: '确定',
                 cancelButtonText: '取消',
                 type: 'warning'
             }).then(() => {
-                console.log(_id)
-                this.$http.post(window.global.debugUrl + "delDescConfig", {id:_id,type:_type,index:_idx}).then((res) => {
+                this.$http.post(window.global.debugUrl + "delDescConfig", {id:_id,type:_type,index:_index}).then((res) => {
                     if (res.body.ok) {
                         this.$message({
                             type: 'success',

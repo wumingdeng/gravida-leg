@@ -43,13 +43,6 @@
                 </el-table-column>
                 <el-table-column label='执行时间' align='center' prop="createtime" :formatter="createdateformatter">
                 </el-table-column>
-                <el-table-column width='80' label='操作' align='center'>
-                    <template scope="scope">
-                        <el-row>
-                            <el-button size="small" type="primary" @click="onDelete(scope.$index, scope.row)">删除</el-button>
-                        </el-row>
-                    </template>
-                </el-table-column>
             </el-table>
         </el-row>
         <el-row type="flex" justify="end" style="padding:20px 0; ">
@@ -88,7 +81,7 @@ export default {
                 v:this.filters
             }
             this.$http.post(window.global.debugUrl + "getStorage_records", pos).then((res) => {
-                if (res.body.d) {
+                if (res.body.d) { 
                     this.$data.total = res.body.d.count;
                     this.$data.tableData = res.body.d.rows;
                 } else {
