@@ -12,7 +12,7 @@ import report from '../views/visits/report.vue';
 import user from '../views/users/user.vue';
 import hospital from '../views/hospital/hospital.vue';
 import goods_config from '../views/goods/goods_config.vue';
-import color_config from '../views/goods/color_config.vue';
+import produce_config from '../views/goods/produce_config.vue';
 import desc_config from '../views/goods/desc_config.vue';
 import goods_list from '../views/goods/goods_list.vue';
 import operate from '../views/storage/operate.vue';
@@ -44,7 +44,7 @@ export default [
             { path: '/goods_list', component: goods_list, name: "入库分销记录" },
             { path: '/in_storage', component: operate, name: "入库操作" },
             { path: '/out_storage', component: operate, name: "出库操作" },
-            { path: '/color_config', component: color_config, name: "颜色配置" },
+            { path: '/produce_config', component: produce_config, name: "商品配置" },
             { path: '/desc_config', component: desc_config, name: "原因配置" },
            
         ],

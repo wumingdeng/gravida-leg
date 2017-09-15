@@ -50,6 +50,7 @@
                     <el-submenu index="4">
                         <template slot="title">货品配置</template>
                         <el-menu-item index="/goods_config">货号配置</el-menu-item>
+                        <el-menu-item index="/produce_config">商品配置</el-menu-item>
                         <el-menu-item index="/desc_config">原因配置</el-menu-item>
                     </el-submenu>
                 </el-menu>

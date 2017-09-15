@@ -15,7 +15,19 @@
         </div>
         <el-row type="flex" align="middle" :gutter="20">
             <el-table v-loading="listLoading" :data="tableData" style="width: 100%">
-                <el-table-column prop="color" label='颜色' align='center'>
+                <el-table-column prop="goods" label='商品内容' align='center'>
+                </el-table-column>
+                <el-table-column prop="showPrice" label='价格' align='center'>
+                </el-table-column>
+                <el-table-column prop="color" label='介绍' align='center'>
+                </el-table-column>
+                <el-table-column prop="color" label='图片张数' align='center'>
+                </el-table-column>
+                <el-table-column prop="showType" label='款型' align='center'>
+                </el-table-column>
+                <el-table-column prop="smallPic" label='首页显示图片' align='center'>
+                </el-table-column>
+                <el-table-column prop="swipePic" label='轮播图片' align='center'>
                 </el-table-column>
                 <el-table-column label='操作' align='center'>
                     <template scope="scope">
@@ -32,19 +44,12 @@
             </el-pagination>
         </el-row>
         <el-dialog :visible.sync="v_form">
-            <el-form ref="form" :model="form" label-width="80px">
-                <el-form-item label="颜色">
-                    <el-input v-model="form.color"></el-input>
-                </el-form-item>
-                <el-form-item>
-                    <el-button type="primary" @click="onSubmit">立即创建</el-button>
-                    <el-button @click="v_form=false">取消</el-button>
-                </el-form-item>
-            </el-form>
+            <mp></mp>
         </el-dialog>
     </div>
 </template>
 <script>
+import mp_vue from './modifyProduce.vue'
 export default {
     data() {
         return {
@@ -61,6 +66,9 @@ export default {
             pageSize: 10,
             total: 10,
         }
+    },
+    components: {
+        "mp": mp_vue
     },
     methods: {
         onDelete(_idx,_id) {

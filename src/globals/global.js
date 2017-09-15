@@ -6,6 +6,7 @@ export default {
   r:{
   },
   page:'',
+  // serverAdr:'http://121.40.254.174:8101',
   serverAdr:'http://192.168.18.165:8101',
   clientUrl:'http://yzg.sujudao.com/yzg/',
   // debugUrl:'http://121.40.254.174:8101/api/',

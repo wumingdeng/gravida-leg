@@ -37,7 +37,7 @@
             <el-pagination :current-page="curPage" :page-sizes="[10, 20, 30, 40]" :page-size="pageSize" layout="sizes, prev, pager, next" :total="total" @size-change="handle_setPageSize" :disabled="false" @current-change="handle_setCurPage">
             </el-pagination>
         </el-row>
-        <el-dialog :visible.sync="v_form">
+        <el-dialog :visible.sync="v_form" :close-on-press-escape="false" :close-on-click-modal="false">
             <el-form ref="form" :model="form" label-width="80px">
                 <el-form-item label="货品号">
                     <el-input v-model="form.pid"></el-input>
@@ -46,7 +46,9 @@
                     <el-input v-model="form.name"></el-input>
                 </el-form-item>
                 <el-form-item label="颜色显示">
-                    <el-table :data="colorTable" border ref="singleTable" highlight-current-row @current-change="handleCurrentChange">
+                    <el-table :data="colorTable" border ref="singleTable" highlight-current-row  @row-click="rowClick">
+                        <el-table-column prop="index" label="顺序">
+                        </el-table-column>
                         <el-table-column prop="color" label="颜色" width="180">
                         </el-table-column>
                         <el-table-column prop="pic" label="图片" width="180" align='center'>
@@ -74,7 +76,7 @@
                     <el-button style="float:left"  type="primary" @click="resetColorPic">重置</el-button>
                 </el-form-item>
                 <el-form-item label="货品尺寸">
-                    <el-select v-model="form.size" multiple placeholder="请选择尺寸">
+                    <el-select v-model="form.size" multiple placeholder="请选择尺寸" size="large">
                         <el-option v-for="s in sizes" :label="s" :value="s" :key="s"></el-option>
                     </el-select>
                 </el-form-item>
@@ -111,13 +113,19 @@ export default {
             pageSize: 10,
             total: 10,
             colorPic:{
+                index:'',
                 color:'',
                 pic:'',
-                file:''
+                file:'',
+                fileName:''
             },
             dialogVisible:false,
             dialogImageUrl: '',
-            selectedRow:null
+            selectedRow:null,
+            updateList:[],
+            deleteList:[],
+            isModify:false,
+            originaValue:''
         }
     },
     computed: {
@@ -127,9 +135,40 @@ export default {
         }
     },
     methods: {
+        findColorTableByColor(color) {
+            for(var key in this.colorTable){
+                var colorRow = this.colorTable[key]
+                if(color == colorRow.color){
+                    return key
+                }
+            }
+        },
         rowClick(row, event, column) {
             if(this.selectedRow){
-                console.log(row.$index)
+                if(this.selectedRow==row){
+                    
+                }else{
+                    var i = this.findColorTableByColor(row.color)
+                    var j = this.findColorTableByColor(this.selectedRow.color)
+                    var temp = 0
+                    temp = row.index
+                    this.colorTable[i].index = this.selectedRow.index
+                    this.colorTable[j].index = temp
+
+                    if(this.isModify){
+                        var i_idx = this.findColorByIndex(this.colorTable[i].index )
+                        var j_idx = this.findColorByIndex(this.colorTable[j].index )
+                        if(i_idx>=0){
+                            this.updateList[i_idx].index = this.colorTable[j].index
+                        }
+                        if(j_idx>=0){
+                            this.updateList[j_idx].index = this.colorTable[i].index
+                        }
+                    }
+                }
+                this.selectedRow = null
+                this.$refs.singleTable.setCurrentRow();
+                console.log(row.index)
             }else{
                 this.selectedRow = row
             }
@@ -137,22 +176,35 @@ export default {
         setCurrent(row) {
             this.$refs.singleTable.setCurrentRow(row);
         },
-        handleCurrentChange(val) {
-            if(this.selectedRow){
-                if(this.selectedRow.$index==val.$index){
-                    console.log("取消")
-                    this.$refs.singleTable.setCurrentRow();
-                    this.selectedRow = null
-                }else{
-
+        handleCurrentChange(val,oldVal) {
+            this.$refs.singleTable.setCurrentRow(val);
+        },
+        findColorByIndex(index){
+            for(var key in this.updateList){
+                if(index == this.updateList[key].index){
+                    return key
                 }
-            }else{
-                this.selectedRow = val;
-                console.log('赋值:'+this.selectedRow)
-                
             }
+            return -1
         },
         onColorDelete(idx) {
+            this.$refs.singleTable.setCurrentRow()
+            this.selectedRow=null
+            var delColor = this.colorTable[idx]
+            for(var idx in this.colorTable){
+                var colorRow = this.colorTable[idx]
+                if(colorRow.index>index){
+                    colorRow.index--
+                }
+            }
+            if(isModify){
+                var _index = this.findColorByIndex(delColor.index)
+                if(_index<0){
+                    this.deleteList.push(delColor.color)
+                }else{
+                    this.updateList.splice(_index,1)
+                }
+            }
             this.colorTable.splice(idx,1)
         },
         onClikcPic() {
@@ -161,6 +213,7 @@ export default {
             this.dialogVisible = true
         },
         resetColorPic() {
+            this.colorPic.index = ''
             this.colorPic.pic = ''
             this.colorPic.color = ''
             this.colorPic.file = ''
@@ -184,8 +237,13 @@ export default {
                 this.$alert('请选择图片');
                 return
             }
+            this.colorPic.index = this.colorTable.length
             var colorpic = Object.assign({},this.colorPic)
+            if(this.isModify){
+                this.updateList.push(colorpic)
+            }
             this.colorTable.push(colorpic)
+            this.colorPic.index=''
             this.colorPic.pic = ''
             this.colorPic.color = ''
             this.colorPic.file = ''
@@ -223,6 +281,7 @@ export default {
                 var imgName = evt.target.files[i].name;
                 this.colorPic.file = evt.target.files[i];
                 this.colorPic.pic = newImg
+                this.colorPic.fileName = 'storage/'+this.form.pid+'/'+imgName
             }
         },
         handleClick(e) {
@@ -295,20 +354,39 @@ export default {
                 this.$alert('请配置货品颜色以及图片');
                 return
             }
-
+            //根据数组对象的属性index 排序
             var formData = new FormData()
             formData.append('pid', this.form.pid);
             formData.append('name', this.form.name);
             formData.append('size', this.form.size);
             var colorStr = ''
+            var nameStr = ''
+            var sumbArr = []
             for (var key in this.colorTable) {
                 var co = this.colorTable[key]
-                formData.append('cps', co.file);
+                sumbArr[co.index] = co
+            }
+            for (var key in sumbArr) {
+                var co = sumbArr[key]
+                if(this.isModify){
+                    nameStr += co.fileName+','
+                }else{
+                    formData.append('cps', co.file);
+                }
                 colorStr += co.color+","
+            }
+
+            if(this.isModify){
+                var idxstr = ''
+                for (var key in this.updateList) {
+                    var co = this.updateList[key]
+                    formData.append('cps', co.file);
+                }
+                nameStr = nameStr.substr(0,nameStr.length-1)
+                formData.append('fileNames', nameStr);
             }
             colorStr = colorStr.substr(0,colorStr.length-1)
             formData.append('color', colorStr);
-       
             this.$http.post(window.global.serverAdr + "/saveGoodCps", formData).then((res) => {
                 if (res.body.ok) {
                     this.$message({
@@ -337,22 +415,66 @@ export default {
                     this.$data.listLoading = false
                 })
         },
+        sortColorTable(colors,pictures) {
+            if(colors && pictures){
+                this.originaValue = pictures
+                var colorsArr = colors.split(",")
+                var picArr = pictures.split(",")
+                for(var key in colorsArr){
+                    var temp = {}
+                    var color = colorsArr[key]
+                    var pic = picArr[key]
+                    temp.index = key
+                    temp.color = color
+                    temp.pic = window.global.serverAdr+'/'+pic
+                    temp.fileName = pic
+                    this.colorTable.push(temp)
+                }
+                
+            }else if(colors){
+                var colorsArr = colors.split(",")
+                for(var key in colorsArr){
+                    var temp = {}
+                    var color = colorsArr[key]
+                    temp.index = key
+                    temp.color = color
+                    temp.pic =''
+                    temp.fileName = ''
+                    this.colorTable.push(temp)
+                }
+            }else if(pictures){
+                var picArr = pictures.split(",")
+                this.originaValue = pictures
+                for(var key in colorsArr){
+                    var temp = {}
+                    var pic = picArr[key]
+                    temp.index = key
+                    temp.color = ''
+                    temp.pic = window.global.serverAdr+'/'+pic
+                    temp.fileName = pic
+                    this.colorTable.push(temp)
+                }
+            }else{
+            }
+        },
         onOpenDialog(index, row) {
+            this.colorTable =[]
             if (row) {
+                this.isModify = true
                 this.form.pid = row.pid
                 this.form.name = row.name
                 this.form.id = row.id
-                this.form.color = row.color
+                this.sortColorTable(row.color,row.pictures)
                 this.form.size = row.size.split(",")
             } else {
+                this.isModify = false
                 delete this.form.id;
                 this.form.pid = ''
                 this.form.name = ''
                 this.colorPic.color=''
                 this.colorPic.pic=''
                 this.colorPic.file=''
-                this.form.size = [],
-                this.colorTable =[]
+                this.form.size = []
             }
             this.v_form = true
         },

@@ -14,10 +14,10 @@
             <el-table v-loading="listLoading" :data="tableData" style="width: 100%">
                 <el-table-column width='400' label='商品信息' align='center'>
                     <template scope="scope">
-                        <el-col :span="7" style='padding-top:10px;padding-left:0px;padding-right:20px'><img width='100' :src="imgSrc(scope.row)" class="image">
+                        <el-col :span="7" style='padding-top:10px;padding-left:0px;padding-right:20px'><img width='100' :src="scope.row.img" class="image">
                         </el-col>
                         <el-col :span="17" style='padding-top:10px;padding-left:0px'>
-                            <el-row style='text-align:left'>{{scope.row.products[0].name}}</el-row>
+                            <el-row style='text-align:left'>{{scope.row.shoeName}}</el-row>
                             <el-row style='text-align:left'>
                                 <div style='float:left;color:#c0c0c0'>颜色：</div>
                                 <div style='color:#ff0000;float:left'>{{scope.row.color}}</div>
@@ -35,8 +35,8 @@
                 </el-table-column>
                 <el-table-column label='金额' align='center'>
                     <template scope="scope">
-                        <el-row>单价:{{scope.row.products[0].price}}￥</el-row>
-                        <el-row style='color:#ff0000'>优惠:{{scope.row.products[0].price-scope.row.price}}￥</el-row>
+                        <el-row>单价:{{scope.row.originalPrice}}￥</el-row>
+                        <el-row style='color:#ff0000'>优惠:{{scope.row.originalPrice-scope.row.price}}￥</el-row>
                         <el-row>合计:{{scope.row.price}}￥</el-row>
                     </template>
                 </el-table-column>
@@ -172,22 +172,65 @@ export default {
             }
             return g.clientUrl + _src
         },
+        fixExpress(row){
+            var pos = { 
+                    id: row.id,
+                    com_no:this.$data.expForm.no,
+                    exp_order_no:this.$data.expForm.name
+                }
+            this.$http.post(g.debugUrl + "fixExpress", pos).then((res) => {
+                if (res.body.ok == -2) {
+                    this.$alert('session过期', '异常', {
+                        confirmButtonText: '确定'
+                    });
+                } else if (res.body.ok == -1) {
+                    this.$alert('数据库执行失败', '异常', {
+                        confirmButtonText: '确定'
+                    });
+                } else if (res.body.ok == 102) {
+                    this.$alert('参数异常', '提示', {
+                        confirmButtonText: '确定'
+                    });
+                } else if (res.body.ok == 1) {
+                    this.$message({
+                        type: 'success',
+                        message: '物流修改成功'
+                    })
+                    row.exp_com_no = this.$data.expForm.no
+                    row.exp_no = this.$data.expForm.name
+                    this.$data.expForm = {
+                        idx: 0,
+                        row: {},
+                        name: '',
+                        no: ''
+                    }
+                } else if (res.body.ok == 0) {
+                    this.$alert('参数异常', '异常', {
+                        confirmButtonText: '确定'
+                    });
+                }
+                this.$data.listLoading = false
+                this.$data.dialogFormVisible = false
+            },
+                (res) => {
+                    this.$data.listLoading = false
+                })
+        },
         handleEdit(idx, row) {
             this.$data.listLoading = true
-            var st = 0
             if (this.$data.change) {
-                st = row.status
-            } else {
-                st = row.status + 1
+                this.fixExpress(row)
+                return 
             }
-            var pos = { id: row.id, status: st }
+            var st = row.status + 1
+            var pos = { id: row.id,status:st}
             if (row.status == 2) {
                 pos.com_no = this.$data.expForm.no
                 pos.exp_order_no = this.$data.expForm.name
-                pos.color= row.color,
-                pos.size= row.size,
-                pos.amount= row.count,
-                pos.pid=row.products[0].pid
+                pos.color=row.color,
+                pos.size=row.size,
+                pos.amount=row.count,
+                pos.pid=row.shoeid
             }
             console.log(pos.com_no + " : " + pos.id + " : " + pos.exp_order_no)
             this.$http.post(g.debugUrl + "updateOrders", pos).then((res) => {
@@ -208,14 +251,9 @@ export default {
                         type: 'success',
                         message: '订单状态修改成'
                     })
-                    if (!this.$data.change) {
-                        this.$data.tableData.splice(idx, 1)
-                        this.total -= 1
-                        this.onUpdateNavCount()
-                    } else {
-                        row.exp_com_no = this.$data.expForm.no
-                        row.exp_no = this.$data.expForm.name
-                    }
+                    this.$data.tableData.splice(idx, 1)
+                    this.total -= 1
+                    this.onUpdateNavCount()
                     this.$data.expForm = {
                         idx: 0,
                         row: {},
