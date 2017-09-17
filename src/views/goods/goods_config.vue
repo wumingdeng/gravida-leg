@@ -133,8 +133,12 @@ export default {
             // return window.global.serverAdr+'/saveGoodCps'
             return ''
         }
+       
     },
     methods: {
+        imgSrc(pic) {
+            return window.global.serverAdr+'/'+pic
+        },
         findColorTableByColor(color) {
             for(var key in this.colorTable){
                 var colorRow = this.colorTable[key]
@@ -191,16 +195,16 @@ export default {
             this.$refs.singleTable.setCurrentRow()
             this.selectedRow=null
             var delColor = this.colorTable[idx]
-            for(var idx in this.colorTable){
-                var colorRow = this.colorTable[idx]
-                if(colorRow.index>index){
+            for(var _idx in this.colorTable){
+                var colorRow = this.colorTable[_idx]
+                if(colorRow.index>idx){
                     colorRow.index--
                 }
             }
-            if(isModify){
+            if(this.isModify){
                 var _index = this.findColorByIndex(delColor.index)
                 if(_index<0){
-                    this.deleteList.push(delColor.color)
+                    this.deleteList.push(delColor.fileName)
                 }else{
                     this.updateList.splice(_index,1)
                 }
@@ -237,6 +241,15 @@ export default {
                 this.$alert('请选择图片');
                 return
             }
+            for (var key in this.colorTable) {
+                var co = this.colorTable[key]
+                console.log('颜色：'+co.color)
+                if(co.color == this.colorPic.color){
+                    this.$alert('颜色 ['+co.color+'] 图片已存在');
+                    return 
+                }
+            }
+
             this.colorPic.index = this.colorTable.length
             var colorpic = Object.assign({},this.colorPic)
             if(this.isModify){
@@ -354,7 +367,11 @@ export default {
                 this.$alert('请配置货品颜色以及图片');
                 return
             }
-            //根据数组对象的属性index 排序
+
+            if (this.colorTable.length == 0) {
+                this.$alert('请配置货品颜色以及图片');
+                return
+            }
             var formData = new FormData()
             formData.append('pid', this.form.pid);
             formData.append('name', this.form.name);
@@ -362,6 +379,8 @@ export default {
             var colorStr = ''
             var nameStr = ''
             var sumbArr = []
+            var colorNames = []
+            //根据数组对象的属性index 排序
             for (var key in this.colorTable) {
                 var co = this.colorTable[key]
                 sumbArr[co.index] = co
@@ -383,10 +402,30 @@ export default {
                     formData.append('cps', co.file);
                 }
                 nameStr = nameStr.substr(0,nameStr.length-1)
+                console.log("fileNames:"+nameStr)
                 formData.append('fileNames', nameStr);
             }
             colorStr = colorStr.substr(0,colorStr.length-1)
             formData.append('color', colorStr);
+
+            if(this.deleteList.length>0){
+                var delPos = {}
+                delPos.fileNames = this.deleteList
+                this.$http.post(window.global.debugUrl + "/delimgs", delPos).then((res) => {
+                if (res.body.ok==1) {
+                   this.saveGoodCps(formData)
+                }
+                this.deleteList = []
+            },
+                (res) => {
+                    this.deleteList = []
+                })
+            }
+            else{
+                this.saveGoodCps(formData)
+            }
+        },
+        saveGoodCps(formData) {
             this.$http.post(window.global.serverAdr + "/saveGoodCps", formData).then((res) => {
                 if (res.body.ok) {
                     this.$message({
@@ -414,7 +453,7 @@ export default {
                 (res) => {
                     this.$data.listLoading = false
                 })
-        },
+            },
         sortColorTable(colors,pictures) {
             if(colors && pictures){
                 this.originaValue = pictures
