@@ -495,6 +495,9 @@ export default {
             }else{
             }
         },
+        getId(){
+
+        },
         onOpenDialog(index, row) {
             this.colorTable =[]
             if (row) {
@@ -506,7 +509,6 @@ export default {
                 this.form.size = row.size.split(",")
             } else {
                 this.isModify = false
-                delete this.form.id;
                 this.form.pid = ''
                 this.form.name = ''
                 this.colorPic.color=''

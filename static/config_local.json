@@ -1,0 +1,4 @@
+{
+    "serverAdr":"http://localhost:8101",
+    "debugUrl":"http://localhost:8101/api/"
+}

@@ -2,7 +2,8 @@
 // 1.if you use import xx from thismodule,will use default
 // 2.if you use import {xx} from this module,will use the varible have name of xx and will be read only
 // 3.if you use import * as xx from thismoudele,will use all as one object name xx
-var  webConfig = require('../../static/config_test.json')
+var  webConfig = require('../../static/config_local.json')
+// var  webConfig = require('../../static/config_test.json')
 // var  webConfig = require('../../static/config_121.json')
 
 console.log(process.env.NODE_ENV )

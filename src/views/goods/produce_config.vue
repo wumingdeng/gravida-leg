@@ -80,16 +80,16 @@
                 </el-form-item>
                 <el-form-item label="货品配置">
                     <el-table :data="produceTable" border ref="singleTable">
-                        <el-table-column prop="index" label="货号">
+                        <el-table-column prop="pid" label="货号">
                         </el-table-column>
-                        <el-table-column prop="color" label="别名" width="180">
+                        <el-table-column prop="alias" label="别名" width="180">
                         </el-table-column>
-                        <el-table-column prop="pic" label="价格" width="180" align='center'>
+                        <el-table-column prop="price" label="价格" width="180" align='center'>
                         </el-table-column>
                         <el-table-column label='操作' align='center'>
                             <template scope="scope">
                                 <el-row>
-                                    <el-button size="small" type="primary" @click="onColorDelete(scope.$index)">删除</el-button>
+                                    <el-button size="small" type="primary" @click="onGoodDelete(scope.$index)">删除</el-button>
                                 </el-row>
                             </template>
                         </el-table-column>
@@ -185,20 +185,45 @@ export default {
             }
         },
         resetProduce() {
-
+            this.goods={
+                pid:'',
+                alias:'',
+                price:''
+            }
         },
         addProduce() {
-
+            if (this.goods.pid.toString().trim() === '') {
+                this.$alert('请输入货号');
+                return
+            }
+            
+            if (this.goods.alias.toString().trim() === '') {
+                this.$alert('请输入别名');
+                return
+            }
+            if (this.goods.price.toString().trim()=== '') {
+                this.$alert('请输入价格');
+                return
+            }
+            this.produceTable.push(this.goods)
+            this.resetProduce()
+        },
+        onGoodDelete(idx) {
+            this.produceTable.splice(idx,1)
         },
         handleRemove(file, fileList) {
-            var i = 0
-            for (var key in this.fileList_2) {
-                if (file.name === key) {
-                    console.log(key)
-                    this.fileDisplayList = fileList
-                    delete this.fileList_2[key];
+            this.fileDisplayList = fileList
+            if(fileList.length==0){
+                this.fileList_2.splice(0,1)
+            }else{
+                for (var key in fileList) {
+                    var _file = fileList[key]
+                    if (_file.uid > file.uid) {
+                        this.fileList_2.splice(key,1)
+                        return
+                    }
                 }
-                i++
+                this.fileList_2.splice(this.fileList_2.length-1,1)
             }
         },
         getObjectURL(file) {
@@ -225,7 +250,7 @@ export default {
                 var imgName = evt.target.files[i].name;
                 var fileObj = {name:imgName,url:newImg}
                 this.fileDisplayList.push(fileObj)
-                this.fileList_2[imgName] = evt.target.files[i];
+                this.fileList_2.push(evt.target.files[i]);
             }
         },
         handleClick(e) {
@@ -268,41 +293,49 @@ export default {
             });
 
         },
+        getProduceContent(){
+            var goods = {}
+            for(var key in this.produceTable){
+                var _goods = this.produceTable[key]
+                goods[_goods.pid] = {alias:_goods.alias,price:_goods.price}
+            }
+            return goods
+        },
         onSubmit() {
-            if (this.form.name.toString().trim() == '') {
-                this.$alert('请输入货号');
-                return
-            }
-            if (this.form.showPrice.toString().trim() == '') {
-                this.$alert('请输入货品名称');
-                return
-            }
+            // if (this.form.name.toString().trim() == '') {
+            //     this.$alert('请输入货号');
+            //     return
+            // }
+            // if (this.form.showPrice.toString().trim() == '') {
+            //     this.$alert('请输入货品名称');
+            //     return
+            // }
             
-            if (this.form.intro.toString().trim() != '') {
-                this.$alert('未提交图片颜色配置');
-                return
-            }
-            if (this.form.introNum.toString().trim() != '') {
-                this.$alert('未提交图片颜色配置');
-                return
-            }
-            if (this.form.showType.toString().trim() != '') {
-                this.$alert('未提交图片颜色配置');
-                return
-            }
-            if (this.form.smallPic.toString().trim() != '') {
-                this.$alert('未提交图片颜色配置');
-                return
-            }
-            if (this.form.swiperPic.toString().trim() != '') {
-                this.$alert('未提交图片颜色配置');
-                return
-            }
+            // if (this.form.intro.toString().trim() != '') {
+            //     this.$alert('未提交图片颜色配置');
+            //     return
+            // }
+            // if (this.form.introNum.toString().trim() != '') {
+            //     this.$alert('未提交图片颜色配置');
+            //     return
+            // }
+            // if (this.form.showType.toString().trim() != '') {
+            //     this.$alert('未提交图片颜色配置');
+            //     return
+            // }
+            // if (this.form.smallPic.toString().trim() != '') {
+            //     this.$alert('未提交图片颜色配置');
+            //     return
+            // }
+            // if (this.form.swiperPic.toString().trim() != '') {
+            //     this.$alert('未提交图片颜色配置');
+            //     return
+            // }
 
-            if (this.produceTable.length == 0) {
-                this.$alert('请配置货品信息');
-                return
-            }
+            // if (this.produceTable.length == 0) {
+            //     this.$alert('请配置货品信息');
+            //     return
+            // }
 
             var formData = new FormData()
             formData.append('showPrice', this.form.showPrice);
@@ -310,25 +343,13 @@ export default {
             formData.append('intro', this.form.intro);
             formData.append('introNum', this.form.introNum);
             formData.append('showType', this.form.showType);
-            for (var key in sumbArr) {
-                var co = sumbArr[key]
-                if(this.isModify){
-                    nameStr += co.fileName+','
-                }else{
-                    formData.append('cps', co.file);
-                }
-                colorStr += co.color+","
-            }
-
+            formData.append('goods', this.getProduceContent());
             if(this.isModify){
                 var idxstr = ''
                 for (var key in this.updateList) {
                     var co = this.updateList[key]
                     formData.append('cps', co.file);
                 }
-                nameStr = nameStr.substr(0,nameStr.length-1)
-                console.log("fileNames:"+nameStr)
-                formData.append('fileNames', nameStr);
             }else{
                 formData.append('cps', this.fileList_1[0]);
                 for (var key in this.fileList_2) {
@@ -353,10 +374,10 @@ export default {
             else{
                 this.saveProduce(formData)
             }
-            
         },
         saveProduce(formData){
-            this.$http.post(window.global.debugUrl + "saveProduceConfig", formData).then((res) => {
+            console.log(window.global.debugUrl)
+            this.$http.post(window.global.serverAdr + "/saveProduceConfig", formData).then((res) => {
                 if (res.body.ok) {
                     this.$message({
                         type: 'success',
@@ -405,6 +426,9 @@ export default {
                     smallPic: '',
                     swiperPic: ''
                 }
+                this.fileDisplayList = []
+                this.fileList_1 = []
+                this.fileList_2 = []
             }
             this.v_form = true
         },
