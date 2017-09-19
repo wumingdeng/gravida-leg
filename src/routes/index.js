@@ -32,6 +32,8 @@ export default [
             { path: '/fukuan', component: order, name: "已付款记录" },
             { path: '/shouhuo', component: order, name: "已收货记录" },
             { path: '/weishouhuo', component: order, name: "未收货记录" },
+            { path: '/fahuo', component: order, name: "已发货记录" },
+            { path: '/pingjia', component: order, name: "已评价记录" },
             { path: '/visit', component: visit, name: "就诊列表" },
             { path: '/report/:no', component: report, name: "客人报告" },
             { path: '/visiter/:no', component: visiter, name: "客人信息" },

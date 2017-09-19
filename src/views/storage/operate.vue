@@ -140,6 +140,17 @@ export default {
         }
     },
     methods: {
+        getObjectURL(file) {
+            var url = null;
+            if (window.createObjectURL != undefined) { // basic
+                url = window.createObjectURL(file);
+            } else if (window.URL != undefined) { // mozilla(firefox)
+                url = window.URL.createObjectURL(file);
+            } else if (window.webkitURL != undefined) { // webkit or chrome
+                url = window.webkitURL.createObjectURL(file);
+            }
+            return url;
+        },
         onSelected(value) {
             if (value == '') return
             var storage = this.storages[value]
@@ -334,8 +345,6 @@ export default {
             this.list = states.map(item => {
                 return { value: item, label: item };
             });
-
-
         },
         getConfigs() {
             this.$http.get(window.global.debugUrl + "getStorageConfigs").then((res) => {

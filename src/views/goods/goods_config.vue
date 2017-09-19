@@ -23,10 +23,9 @@
                 </el-table-column>
                 <el-table-column prop="size" label='尺寸' align='center'>
                 </el-table-column>
-                <el-table-column label='操作' align='center'>
+                <el-table-column label='操作' align='center' width='100'>
                     <template scope="scope">
                         <el-row>
-                            <el-button size="small" type="primary" @click="onDelete(scope.$index, scope.row.id)">删除</el-button>
                             <el-button size="small" type="primary" @click="onOpenDialog(scope.$index, scope.row)">修改</el-button>
                         </el-row>
                     </template>
@@ -51,7 +50,7 @@
                         </el-table-column>
                         <el-table-column prop="color" label="颜色" width="180">
                         </el-table-column>
-                        <el-table-column prop="pic" label="图片" width="180" align='center'>
+                        <el-table-column prop="pic" label="图片" width="180" align='center'> 
                             <template scope="scope">
                                 <img style='width:50%;' :src = "scope.row.pic" @click="onClikcPic"/>
                             </template>

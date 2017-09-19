@@ -1,6 +1,0 @@
-{
-    "/api/getWeightInfo":"获取体重信息",
-    "/api/getWeightData":"获取体重数据",
-    "/api/getWeightChart":"获取体重记录",
-    "/api/orderlistUser":"获取用户列表"
-}

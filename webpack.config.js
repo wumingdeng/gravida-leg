@@ -1,7 +1,9 @@
 const resolve = require('path').resolve
 const webpack = require('webpack')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
+const CopyWebpackPlugin = require('copy-webpack-plugin')
 const url = require('url')
+const path = require('path')
 const publicPath = ''
 
 module.exports = (options = {}) => ({
@@ -46,7 +48,15 @@ module.exports = (options = {}) => ({
     }),
     new HtmlWebpackPlugin({
       template: 'src/index.html'
-    })
+    }),
+    // copy custom static assets
+    new CopyWebpackPlugin([
+      {
+        from: path.resolve(__dirname, './static'),
+        to: 'static',
+        ignore: ['.*']
+      }
+    ]),
   ],
   resolve: {
     alias: {
@@ -54,11 +64,11 @@ module.exports = (options = {}) => ({
     }
   },
   devServer: {
-    host: 'localhost',
+    host: '192.168.18.165',
     port: 8011,
     proxy: {
       '/api/': {
-        target: 'localhost',
+        target: '192.168.18.165',
         changeOrigin: true,
         pathRewrite: {
           '^/api': ''

@@ -1,0 +1,25 @@
+{
+    "data":[
+        { "key": "AJ", "value": "安捷快递" },
+        { "key": "BTWL", "value": "百世快运" },
+        { "key": "DBL", "value": "德邦" },
+        { "key": "EMS", "value": "EMS" },
+        { "key": "FEDEX", "value": "FEDEX联邦(国内件）" },
+        { "key": "FEDEX_GJ", "value": "FEDEX联邦(国际件)" },
+        { "key": "GTO", "value": "国通快递" },
+        { "key": "HHTT", "value": "天天快递" },
+        { "key": "HTKY", "value": "百世快递" },
+        { "key": "SF", "value": "顺丰快递" },
+        { "key": "STO", "value": "申通快递" },
+        { "key": "YD", "value": "韵达快递" },
+        { "key": "YTO", "value": "圆通速递" },
+        { "key": "YZPY", "value": "邮政平邮/小包" },
+        { "key": "ZJS", "value": "宅急送" },
+        { "key": "ZTO", "value": "中通速递" },
+        { "key": "AMAZON", "value": "亚马逊物流" },
+        { "key": "SUBIDA", "value": "速必达物流" },
+        { "key": "CJKD", "value": "城际快递" },
+        { "key": "CNPEX", "value": "CNPEX中邮快递" },
+        { "key": "HPTEX", "value": "海派通物流公司" }
+    ]
+}

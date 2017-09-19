@@ -2,16 +2,16 @@
 // 1.if you use import xx from thismodule,will use default
 // 2.if you use import {xx} from this module,will use the varible have name of xx and will be read only
 // 3.if you use import * as xx from thismoudele,will use all as one object name xx
+var  webConfig = require('../../static/config_test.json')
+// var  webConfig = require('../../static/config_121.json')
+
+console.log(process.env.NODE_ENV )
 export default {
   r:{
   },
   page:'',
-  // serverAdr:'http://121.40.254.174:8101',
-  serverAdr:'http://192.168.18.165:8101',
-  clientUrl:'http://yzg.sujudao.com/yzg/',
-  // debugUrl:'http://121.40.254.174:8101/api/',
-  debugUrl:'http://192.168.18.165:8101/api/',
-  // debugUrl:'http://139.196.238.46:8101/api/',
+  serverAdr:webConfig.serverAdr,
+  debugUrl:webConfig.debugUrl,
   staticConfigs:{
     "gravida_storage_configs":{
       "N1002":{"id":9,"pid":"N1002","name":"SHOE1002","color":"黑色,红色,绿色","size":"32","color_place":null},

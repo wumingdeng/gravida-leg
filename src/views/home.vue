@@ -21,17 +21,23 @@
                 <el-menu default-active="/weifukuan" theme="dark" :router="true" unique-opened>
                     <el-submenu index="1" v-if="getWeight('0')">
                         <template slot="title">订单管理</template>
-                        <el-menu-item index="/weifukuan">未付款
+                        <el-menu-item index="/weifukuan">待付款
                             <div v-if="s1_cout>0" class="notice">{{s1_cout}}</div>
                         </el-menu-item>
-                        <el-menu-item index="/fukuan">已付款
+                        <el-menu-item index="/fukuan">待备货
                             <div v-if="s2_cout>0" class="notice">{{s2_cout}}</div>
                         </el-menu-item>
-                        <el-menu-item index="/weishouhuo">未发货
+                        <el-menu-item index="/weishouhuo">待发货
                             <div v-if="s3_cout>0" class="notice">{{s3_cout}}</div>
                         </el-menu-item>
-                        <el-menu-item index="/shouhuo">已发货
+                        <el-menu-item index="/fahuo">已发货
                             <div v-if="s4_cout>0" class="notice">{{s4_cout}}</div>
+                        </el-menu-item>
+                        <el-menu-item index="/shouhuo">已收货
+                            <div v-if="s5_cout>0" class="notice">{{s5_cout}}</div>
+                        </el-menu-item>
+                        <el-menu-item index="/pingjia">已评价
+                            <div v-if="s6_cout>0" class="notice">{{s6_cout}}</div>
                         </el-menu-item>
                     </el-submenu>
                     <el-menu-item index="/user" v-if="getWeight('1')">用户管理</el-menu-item>
@@ -90,6 +96,8 @@ export default {
             s2_cout: 0,
             s3_cout: 0,
             s4_cout: 0,
+            s5_cout: 0,
+            s6_cout: 0,
             weight: []
         }
     },
@@ -148,6 +156,12 @@ export default {
                             this.$data.s3_cout = co.count
                         }else if(row.status === 3){
                             this.$data.s4_cout = co.count
+                        }else if(row.status === 8){
+                            this.$data.s5_cout = co.count
+                        }else if(row.status === 4){
+                            this.$data.s5_cout += co.count
+                        }else if(row.status === 5){
+                            this.$data.s6_cout = co.count
                         }
                     }
                 }

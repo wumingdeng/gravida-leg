@@ -10,13 +10,13 @@
                 </el-form-item>
             </el-form>
         </div>
-        <el-row type="flex" align="middle" :gutter="20">
+        <el-row type="flex" align="middle" :gutter="0">
             <el-table v-loading="listLoading" :data="tableData" style="width: 100%">
-                <el-table-column width='400' label='商品信息' align='center'>
+                <el-table-column width='330' label='商品信息' align='center'>
                     <template scope="scope">
                         <el-col :span="7" style='padding-top:10px;padding-left:0px;padding-right:20px'><img width='100' :src="scope.row.img" class="image">
                         </el-col>
-                        <el-col :span="17" style='padding-top:10px;padding-left:0px'>
+                        <el-col :span="17" style='padding-top:10px;padding-left:20px'>
                             <el-row style='text-align:left'>{{scope.row.shoeName}}</el-row>
                             <el-row style='text-align:left'>
                                 <div style='float:left;color:#c0c0c0'>颜色：</div>
@@ -33,7 +33,7 @@
                         </el-col>
                     </template>
                 </el-table-column>
-                <el-table-column label='金额' align='center'>
+                <el-table-column label='金额' width='150' align='center'>
                     <template scope="scope">
                         <el-row>单价:{{scope.row.originalPrice}}￥</el-row>
                         <el-row style='color:#ff0000'>优惠:{{scope.row.originalPrice-scope.row.price}}￥</el-row>
@@ -46,20 +46,22 @@
                         <el-row>{{createdateformatter(scope.row)}}</el-row>
                     </template>
                 </el-table-column>
-                <el-table-column width='300' label='联系方式' align='center'>
+                <el-table-column label='联系方式' align='center' :show-overflow-tooltip="true">
                     <template scope="scope">
                         <el-row>{{scope.row.contact}} {{scope.row.tel}}</el-row>
                         <el-row>{{scope.row.province+" "+scope.row.city+" "+scope.row.area}}</el-row>
                         <el-row>{{scope.row.address}}</el-row>
                     </template>
                 </el-table-column>
-                <el-table-column label='操作' align='center'>
+                <el-table-column v-if="isOprStatus" :label="statusLabel" width='100' align='center' :show-overflow-tooltip="true">
                     <template scope="scope">
                         <el-row>
                             <el-button v-if="scope.row.status == 1" size="small" @click="open2(scope.$index, scope.row)">开始备货</el-button>
                             <el-button v-else-if="scope.row.status == 2" size="small" @click="open2(scope.$index, scope.row)">开始发货</el-button>
                             <el-button v-else-if="scope.row.status == 3" size="small" @click="open2(scope.$index, scope.row)">查看物流</el-button>
-                            <el-button v-else size="small">无操作</el-button>
+                            <el-col v-else-if="scope.row.status == 5" >{{scope.row.content}}</el-col>
+                            <el-col v-else-if="scope.row.status == 8" >默认收货</el-col>
+                            <el-col v-else-if="scope.row.status == 4" >买家收货</el-col>
                         </el-row>
                         <el-row v-if="scope.row.status == 3">
                             <el-button size="small" @click="open3(scope.$index, scope.row)">修改物流</el-button>
@@ -101,7 +103,7 @@
 <script>
 import api from "../../util/api.js";
 import g from "../../globals/global.js";
-import expNos from "../../../expressNo.json";
+import expNos from "../../../static/expressNo.json";
 export default {
     data() {
         return {
@@ -130,48 +132,34 @@ export default {
             },
             change: false,
             formLabelWidth: '120px',
-            options: [
-                { key: "AJ", value: "安捷快递" },
-                { key: "BTWL", value: "百世快运" },
-                { key: "DBL", value: "德邦" },
-                { key: "EMS", value: "EMS" },
-                { key: "FEDEX", value: "FEDEX联邦(国内件）" },
-                { key: "FEDEX_GJ", value: "FEDEX联邦(国际件)" },
-                { key: "GTO", value: "国通快递" },
-                { key: "HHTT", value: "天天快递" },
-                { key: "HTKY", value: "百世快递" },
-                { key: "SF", value: "顺丰快递" },
-                { key: "STO", value: "申通快递" },
-                { key: "YD", value: "韵达快递" },
-                { key: "YTO", value: "圆通速递" },
-                { key: "YZPY", value: "邮政平邮/小包" },
-                { key: "ZJS", value: "宅急送" },
-                { key: "ZTO", value: "中通速递" },
-                { key: "AMAZON", value: "亚马逊物流" },
-                { key: "SUBIDA", value: "速必达物流" },
-                { key: "CJKD", value: "城际快递" },
-                { key: "CNPEX", value: "CNPEX中邮快递" },
-                { key: "HPTEX", value: "海派通物流公司" }
-            ],
+            options:expNos.data,
+            // options: [
+            //     { key: "AJ", value: "安捷快递" },
+            //     { key: "BTWL", value: "百世快运" },
+            //     { key: "DBL", value: "德邦" },
+            //     { key: "EMS", value: "EMS" },
+            //     { key: "FEDEX", value: "FEDEX联邦(国内件）" },
+            //     { key: "FEDEX_GJ", value: "FEDEX联邦(国际件)" },
+            //     { key: "GTO", value: "国通快递" },
+            //     { key: "HHTT", value: "天天快递" },
+            //     { key: "HTKY", value: "百世快递" },
+            //     { key: "SF", value: "顺丰快递" },
+            //     { key: "STO", value: "申通快递" },
+            //     { key: "YD", value: "韵达快递" },
+            //     { key: "YTO", value: "圆通速递" },
+            //     { key: "YZPY", value: "邮政平邮/小包" },
+            //     { key: "ZJS", value: "宅急送" },
+            //     { key: "ZTO", value: "中通速递" },
+            //     { key: "AMAZON", value: "亚马逊物流" },
+            //     { key: "SUBIDA", value: "速必达物流" },
+            //     { key: "CJKD", value: "城际快递" },
+            //     { key: "CNPEX", value: "CNPEX中邮快递" },
+            //     { key: "HPTEX", value: "海派通物流公司" }
+            // ],
             info_exps: []
         }
     },
     methods: {
-        imgSrc(row) {
-            return g.serverAdr + '/storage/N1002/color1.jpg'
-            var colors = row.products[0].color
-            var _color = row.color
-            var _src = ''
-            var colorsJson = JSON.parse(colors)
-            for (var key in colorsJson) {
-                
-                if (key == _color) {
-                    _src = colorsJson[key]
-                    break;
-                }
-            }
-            return g.clientUrl + _src
-        },
         fixExpress(row){
             var pos = { 
                     id: row.id,
@@ -272,26 +260,16 @@ export default {
                     this.$data.listLoading = false
                 })
         },
-        statusFor(value) {
-            switch (value) {
-                case 0:
-                    return "未付款";
-                case 1:
-                    return "已付款";
-                case 2:
-                    return "未发货";
-                case 3:
-                    return "已发货";
-                default:
-                    return ""
-            }
-        },
         createdateformatter(row) {
             var st = row.status
             var temptime = row.updatetime
             console.log(temptime)
             if(temptime==null || st == 0){
-                var temptime = row.createtime
+                temptime = row.createtime
+            }else if(st==5){
+                temptime = row.time
+            }else if(st == 8 || st == 9 ){
+                temptime = row.delivertime
             }
             var unixTimestamp = new Date(temptime * 1000);
             return unixTimestamp.toLocaleString();
@@ -313,9 +291,13 @@ export default {
             }
             this.$http.post(g.debugUrl + "getOrders", postData).then((res) => {
                 if (res.body.d) {
-                    this.$data.total = res.body.d.count;
-                    this.$data.tableData = res.body.d.rows;
-                    console.log(this.$data.tableData)
+                    if(this.status==5){
+                        this.$data.total = res.body.count;
+                        this.$data.tableData = res.body.d;
+                    }else{
+                        this.$data.total = res.body.d.count;
+                        this.$data.tableData = res.body.d.rows;
+                    }
                 }
                 this.$data.listLoading = false
             },
@@ -402,9 +384,14 @@ export default {
             }
             this.$http.post(g.debugUrl + "getOrdersBylike", postData).then((res) => {
                 if (res.body.d) {
-                    this.$data.total = res.body.d.count;
-                    this.$data.tableData = res.body.d.rows;
-                    
+                    if(this.status==5){
+                        this.$data.total = res.body.count;
+                        this.$data.tableData = res.body.d;
+                    }
+                    else{
+                        this.$data.total = res.body.d.count;
+                        this.$data.tableData = res.body.d.rows;
+                    }
                 } else {
                     this.$alert("数据获取异常", '异常', {
                         confirmButtonText: '确定'
@@ -427,11 +414,17 @@ export default {
                 case "/weishouhuo":
                     this.status = 2
                     break;
-                case "/shouhuo":
+                case "/fahuo":
                     this.status = 3
                     break;
-                default:
+                case "/shouhuo":
                     this.status = 4
+                    break;
+                case "/pingjia":
+                    this.status = 5
+                    break;
+                default:
+                    this.status = -1
                     break
             }
         },
@@ -441,6 +434,23 @@ export default {
             eventBus.$emit("onselectedOrder", { st: this.status, count: this.total })
         }
     },
+    computed:{
+        isOprStatus(){
+            return this.status!=0
+        },
+        ispjOprStatus(){
+            return this.status==5
+        },
+        statusLabel(){
+            if(this.status==1 || this.status==2 || this.status==3 || this.status==4){
+                return '操作'
+            }else if(this.status==5){
+                return '评价内容'
+            }else{
+
+            }
+        }
+    },
     mounted() {
         console.log('111111')
         this.getStatus(this.$route.path)
@@ -448,7 +458,6 @@ export default {
     },
     watch: {
         '$route'(to, from) {
-            console.log('22222')
             this.filters.name = ''
             this.getStatus(this.$route.path)
             this.curPage = 1

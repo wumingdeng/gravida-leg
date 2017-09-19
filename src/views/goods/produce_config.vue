@@ -3,7 +3,7 @@
         <div class="toolbar">
             <el-form :inline="true" :model="filters">
                 <el-form-item>
-                    <el-input v-model="filters.color" placeholder="颜色"></el-input>
+                    <el-input v-model="filters.color" placeholder="名称"></el-input>
                 </el-form-item>
                 <el-form-item>
                     <el-button type="primary" v-on:click="getConfigs()">查询</el-button>
@@ -13,23 +13,28 @@
                 </el-form-item>
             </el-form>
         </div>
-        <el-row type="flex" align="middle" :gutter="20">
+        <el-row type="flex" align="middle" :gutter="0">
             <el-table v-loading="listLoading" :data="tableData" style="width: 100%">
                 <el-table-column prop="goods" label='商品内容' align='center'>
                 </el-table-column>
-                <el-table-column prop="showPrice" label='价格' align='center'>
+                <el-table-column prop="name" label='商品名称' align='center'>
                 </el-table-column>
-                <el-table-column prop="color" label='介绍' align='center'>
+                <el-table-column prop="showPrice" label='价格' width='100' align='center'>
                 </el-table-column>
-                <el-table-column prop="color" label='图片张数' align='center'>
+                <el-table-column prop="intro" label='介绍' align='center'>
                 </el-table-column>
-                <el-table-column prop="showType" label='款型' align='center'>
+                <el-table-column prop="introNum" label='介绍图数' width='100' align='center'>
                 </el-table-column>
-                <el-table-column prop="smallPic" label='首页显示图片' align='center'>
+                <el-table-column prop="showType" label='款型' width='100' align='center'>
+                </el-table-column>
+                <el-table-column  label='首页显示图片' align='center'>
+                    <template scope="scope">
+                       <img style="width:50%" :src="scope.row.smallPic"/>
+                    </template>
                 </el-table-column>
                 <el-table-column prop="swipePic" label='轮播图片' align='center'>
                 </el-table-column>
-                <el-table-column label='操作' align='center'>
+                <el-table-column label='操作' align='center' width='150'>
                     <template scope="scope">
                         <el-row>
                             <el-button size="small" type="primary" @click="onDelete(scope.$index, scope.row.id)">删除</el-button>
@@ -43,8 +48,66 @@
             <el-pagination :current-page="curPage" :page-sizes="[10, 20, 30, 40]" :page-size="pageSize" layout="sizes, prev, pager, next" :total="total" @size-change="handle_setPageSize" @current-change="handle_setCurPage">
             </el-pagination>
         </el-row>
-        <el-dialog :visible.sync="v_form">
-            <mp></mp>
+        <el-dialog :visible.sync="v_form" :close-on-press-escape="false" :close-on-click-modal="false">
+            <el-form ref="form" :model="form" label-width="80px">
+                <el-form-item label="商品名称">
+                    <el-input v-model="form.name"></el-input>
+                </el-form-item>
+                <el-form-item label="商品价格">
+                    <el-input v-model="form.showPrice"></el-input>
+                </el-form-item>
+                <el-form-item label="商品介绍">
+                    <el-input v-model="form.intro"></el-input>
+                </el-form-item>
+                <el-form-item label="介绍图数">
+                    <el-input v-model="form.introNum"></el-input>
+                </el-form-item>
+                <el-form-item label="款型">
+                    <el-input v-model="form.showType"></el-input>
+                </el-form-item>
+                <el-form-item label="首页图片">
+                    <el-upload style="float:left" class="upload-demo" ref="upload" :action="''" disabled :show-file-list="false" :auto-upload="false" list-type="picture-card">
+                        <img v-if="form.smallPic" :src="imgSrc" class="avatar" style="max-width:100px">
+                        <i v-else class="el-icon-plus avatar-uploader-icon" v-on:click="handleClick"></i>
+                    </el-upload>
+                    <input type="file" id="uploadfile" accept="audio/mpeg,image/png,image/jpeg" style="display:none;width:250px;" v-on:change="getFileInfo" />
+                </el-form-item>
+                <el-form-item label="轮播图片">
+                    <el-upload style="float:left" class="upload-demo" ref="upload" :action="''" disabled  show-file-list :on-remove="handleRemove" :file-list="fileDisplayList" :auto-upload="false" list-type="picture-card">
+                        <i class="el-icon-plus avatar-uploader-icon" v-on:click="handleSwiperClick"></i>
+                    </el-upload>
+                    <input type="file" id="uploadSwiperfile" accept="audio/mpeg,image/png,image/jpeg" style="display:none;width:250px;" v-on:change="getSwiperFileInfo" />
+                </el-form-item>
+                <el-form-item label="货品配置">
+                    <el-table :data="produceTable" border ref="singleTable">
+                        <el-table-column prop="index" label="货号">
+                        </el-table-column>
+                        <el-table-column prop="color" label="别名" width="180">
+                        </el-table-column>
+                        <el-table-column prop="pic" label="价格" width="180" align='center'>
+                        </el-table-column>
+                        <el-table-column label='操作' align='center'>
+                            <template scope="scope">
+                                <el-row>
+                                    <el-button size="small" type="primary" @click="onColorDelete(scope.$index)">删除</el-button>
+                                </el-row>
+                            </template>
+                        </el-table-column>
+                    </el-table>
+                    <el-select style="float:left;width:30%;" v-model="goods.pid" filterable remote placeholder="请输入货号" :remote-method="remoteMethod" :loading="loading" @change="onSelected">
+                        <el-option v-for="item in options4" :key="item.value" :label="item.label" :value="item.value">
+                        </el-option>
+                    </el-select>
+                    <el-input v-model="goods.alias" placeholder="请输入别名" style="width:20%;float:left;margin-left:10px"></el-input>
+                    <el-input v-model="goods.price" placeholder="请输入价格" style="width:20%;float:left;margin-left:10px"></el-input>
+                    <el-button style="float:left;margin-left:10px"  type="primary" @click="addProduce">提交</el-button>
+                    <el-button style="float:left"  type="primary" @click="resetProduce">重置</el-button>
+                </el-form-item>
+                <el-form-item>
+                    <el-button type="primary" @click="onSubmit">立即创建</el-button>
+                    <el-button @click="v_form=false">取消</el-button>
+                </el-form-item>
+            </el-form>
         </el-dialog>
     </div>
 </template>
@@ -54,37 +117,137 @@ export default {
     data() {
         return {
             form: {
-                color: '',
+                id:'',
+                name: '',
+                showPrice: '',
+                intro: '',
+                introNum: '',
+                showType: '',
+                smallPic: '',
+                swiperPic: ''
             },
             filters: {
-                color: ''
+                name: ''
             },
+            goods:{
+                pid:'',
+                alias:'',
+                price:''
+            },
+            fileDisplayList:[], //轮播图片的显示列表
+            fileList_1:[], //首页的图片
+            fileList_2:[], //轮播的图片
+            deleteList:[], //删除的图片的列表
+            options4: [],
             tableData: [],
+            produceTable:[],
             listLoading: false,
+            loading: false,
             v_form: false,
             curPage: 1,
             pageSize: 10,
             total: 10,
+            isModify:false
         } 
     },
     components: {
         "mp": mp_vue
     },
+    computed:{
+        imgSrc() {
+            if(this.form.smallPic.indexOf('http')<0){
+                return window.gloabl.serverAdr+'/'+this.form.smallPic
+            }else{
+                return this.form.smallPic
+            }
+        }
+    },
     methods: {
+        onSelected(value) {
+            if (value == '') return
+            var storage = this.storages[value]
+            // this.sizes = storage.size.split(',')
+            // this.colors = storage.color.split(",");
+            // console.log(this.colors)
+        },
+        remoteMethod(query) {
+            if (query !== '') {
+                this.loading = true;
+                setTimeout(() => {
+                    this.loading = false;
+                    this.options4 = this.list.filter(item => {
+                        return item.label.toLowerCase()
+                            .indexOf(query.toLowerCase()) > -1;
+                    });
+                }, 200);
+            } else {
+                this.options4 = [];
+            }
+        },
+        resetProduce() {
+
+        },
+        addProduce() {
+
+        },
+        handleRemove(file, fileList) {
+            var i = 0
+            for (var key in this.fileList_2) {
+                if (file.name === key) {
+                    console.log(key)
+                    this.fileDisplayList = fileList
+                    delete this.fileList_2[key];
+                }
+                i++
+            }
+        },
+        getObjectURL(file) {
+            var url = null;
+            if (window.createObjectURL != undefined) { // basic
+                url = window.createObjectURL(file);
+            } else if (window.URL != undefined) { // mozilla(firefox)
+                url = window.URL.createObjectURL(file);
+            } else if (window.webkitURL != undefined) { // webkit or chrome
+                url = window.webkitURL.createObjectURL(file);
+            }
+            return url;
+        },
+        getFileInfo(evt) {
+                var newImg = this.getObjectURL(evt.target.files[0])
+                var imgName = evt.target.files[0].name;
+                console.log(newImg)
+                this.form.smallPic = newImg
+                this.fileList_1.push(evt.target.files[0])
+        },
+        getSwiperFileInfo(evt) {
+            for (var i = 0; i < evt.target.files.length; ++i) {
+                var newImg = this.getObjectURL(evt.target.files[i])
+                var imgName = evt.target.files[i].name;
+                var fileObj = {name:imgName,url:newImg}
+                this.fileDisplayList.push(fileObj)
+                this.fileList_2[imgName] = evt.target.files[i];
+            }
+        },
+        handleClick(e) {
+            document.getElementById('uploadfile').click()
+        },
+        handleSwiperClick(e) {
+            document.getElementById('uploadSwiperfile').click()
+        },
         onDelete(_idx,_id) {
-            this.$confirm('是否删除该配置条目, 是否继续?', '提示', {
+            this.$confirm('是否删除该商品, 是否继续?', '提示', {
                 confirmButtonText: '确定',
                 cancelButtonText: '取消',
                 type: 'warning'
             }).then(() => {
                 console.log(_id)
-                this.$http.post(window.global.debugUrl + "delColorConfig", {id:_id}).then((res) => {
+                this.$http.post(window.global.debugUrl + "delProduce", {id:_id}).then((res) => {
                     if (res.body.ok) {
                         this.$message({
                             type: 'success',
                             message: '删除成功'
                         })
-                        window.global.staticConfigs.gravida_color_configs = res.body.ok
+                        window.global.staticConfigs.gravida_produce_configs = res.body.ok
                         this.$data.tableData.splice(_idx,1)
                     } else {
                         this.$alert('参数异常', '异常', {
@@ -106,11 +269,94 @@ export default {
 
         },
         onSubmit() {
-            if (this.form.color.toString().trim() == '') {
-                this.$alert('请输入颜色');
+            if (this.form.name.toString().trim() == '') {
+                this.$alert('请输入货号');
                 return
             }
-            this.$http.post(window.global.debugUrl + "saveColorConfig", this.$data.form).then((res) => {
+            if (this.form.showPrice.toString().trim() == '') {
+                this.$alert('请输入货品名称');
+                return
+            }
+            
+            if (this.form.intro.toString().trim() != '') {
+                this.$alert('未提交图片颜色配置');
+                return
+            }
+            if (this.form.introNum.toString().trim() != '') {
+                this.$alert('未提交图片颜色配置');
+                return
+            }
+            if (this.form.showType.toString().trim() != '') {
+                this.$alert('未提交图片颜色配置');
+                return
+            }
+            if (this.form.smallPic.toString().trim() != '') {
+                this.$alert('未提交图片颜色配置');
+                return
+            }
+            if (this.form.swiperPic.toString().trim() != '') {
+                this.$alert('未提交图片颜色配置');
+                return
+            }
+
+            if (this.produceTable.length == 0) {
+                this.$alert('请配置货品信息');
+                return
+            }
+
+            var formData = new FormData()
+            formData.append('showPrice', this.form.showPrice);
+            formData.append('name', this.form.name);
+            formData.append('intro', this.form.intro);
+            formData.append('introNum', this.form.introNum);
+            formData.append('showType', this.form.showType);
+            for (var key in sumbArr) {
+                var co = sumbArr[key]
+                if(this.isModify){
+                    nameStr += co.fileName+','
+                }else{
+                    formData.append('cps', co.file);
+                }
+                colorStr += co.color+","
+            }
+
+            if(this.isModify){
+                var idxstr = ''
+                for (var key in this.updateList) {
+                    var co = this.updateList[key]
+                    formData.append('cps', co.file);
+                }
+                nameStr = nameStr.substr(0,nameStr.length-1)
+                console.log("fileNames:"+nameStr)
+                formData.append('fileNames', nameStr);
+            }else{
+                formData.append('cps', this.fileList_1[0]);
+                for (var key in this.fileList_2) {
+                    var co = this.fileList_2[key]
+                    formData.append('cps', co);
+                }
+            }
+
+            if(this.deleteList.length>0){
+                var delPos = {}
+                delPos.fileNames = this.deleteList
+                this.$http.post(window.global.debugUrl + "/delimgs", delPos).then((res) => {
+                if (res.body.ok==1) {
+                   this.saveProduce(formData)
+                }
+                this.deleteList = []
+            },
+                (res) => {
+                    this.deleteList = []
+                })
+            }
+            else{
+                this.saveProduce(formData)
+            }
+            
+        },
+        saveProduce(formData){
+            this.$http.post(window.global.debugUrl + "saveProduceConfig", formData).then((res) => {
                 if (res.body.ok) {
                     this.$message({
                         type: 'success',
@@ -120,7 +366,7 @@ export default {
                     this.$data.form = {
                         color: '',
                     }
-                    window.global.staticConfigs.gravida_color_configs = res.body.ok
+                    window.global.staticConfigs.gravida_produce_configs = res.body.ok
                 } else {
                     this.$alert('参数异常', '异常', {
                         confirmButtonText: '确定'
@@ -135,10 +381,30 @@ export default {
         },
         onOpenDialog(row) {
             if (row) {
-                this.form.color = row.color
+                this.isModify = true
+                this.form =  {
+                    id:row.id,
+                    name: row.name,
+                    showPrice: row.showPrice,
+                    intro: row.intro,
+                    introNum: row.introNum,
+                    showType: row.showType,
+                    smallPic: row.smallPic,
+                    swiperPic: row.swiperPic
+                }
             } else {
+                this.isModify = false
                 delete this.form.id;
-                this.form.color = ''
+                this.form =  {
+                    id:'',
+                    name: '',
+                    showPrice: '',
+                    intro: '',
+                    introNum: '',
+                    showType: '',
+                    smallPic: '',
+                    swiperPic: ''
+                }
             }
             this.v_form = true
         },
@@ -150,6 +416,18 @@ export default {
             this.$data.curPage = currentPage
             this.getConfigs()
         },
+        sortData() {
+            this.storages = window.global.staticConfigs.gravida_storage_configs
+            var states = []
+            console.log(this.storages.pid)
+            for (var key in this.storages) {
+                var s = this.storages[key]
+                states.push(s['pid'])
+            }
+            this.list = states.map(item => {
+                return { value: item, label: item };
+            });
+        },
         getConfigs() {
             this.$data.tableData = []
             this.$data.listLoading = true
@@ -158,7 +436,7 @@ export default {
                 limit: this.$data.pageSize,
                 v:this.filters
             }
-            this.$http.post(window.global.debugUrl + "getColorConfigs",pos).then((res) => {
+            this.$http.post(window.global.debugUrl + "getProduceConfigs",pos).then((res) => {
                 if (res.body.d) {
                     this.$data.total = res.body.d.count;
                     this.$data.tableData = res.body.d.rows;
@@ -176,6 +454,7 @@ export default {
     },
     mounted(){
         this.getConfigs()
+        this.sortData()
     }
 }
 </script>
