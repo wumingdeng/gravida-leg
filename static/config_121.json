@@ -1,4 +1,5 @@
 {
     "serverAdr":"http://121.40.254.174:8101",
-    "debugUrl":"http://121.40.254.174:8101/api/"
+    "debugUrl":"http://121.40.254.174:8101/api/",
+    "yxdServer":"http://yzg.sujudao.com:8192/api/"
 }

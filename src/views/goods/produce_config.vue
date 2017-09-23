@@ -11,33 +11,41 @@
                 <el-form-item>
                     <el-button type="primary" v-on:click="onOpenDialog()">添加</el-button>
                 </el-form-item>
+                <el-form-item>
+                    <el-button type="primary" v-on:click="freshConfig()">刷新商品数据</el-button>
+                </el-form-item>
             </el-form>
         </div>
         <el-row type="flex" align="middle" :gutter="0">
             <el-table v-loading="listLoading" :data="tableData" style="width: 100%">
-                <el-table-column prop="goods" label='商品内容' align='center'>
+                <el-table-column prop="id" label='商品ID' width='80' align='center'>
+                </el-table-column>
+                <el-table-column label='商品内容' align='center'>
+                    <template scope="scope">
+                        <el-row v-for="(item,idx) in sortGoodsContent(scope.row.goods)" :key="idx">
+                            货号:{{item.pid}} 别名:{{item.alias}} 价格:{{item.price}}
+                        </el-row>
+                    </template>
                 </el-table-column>
                 <el-table-column prop="name" label='商品名称' align='center'>
                 </el-table-column>
                 <el-table-column prop="showPrice" label='价格' width='100' align='center'>
                 </el-table-column>
-                <el-table-column prop="intro" label='介绍' align='center'>
+                <el-table-column prop="intro" label='介绍内容' align='center'>
                 </el-table-column>
-                <el-table-column prop="introNum" label='介绍图数' width='100' align='center'>
+                <el-table-column prop="introNum" label='介绍数' width='80' align='center'>
                 </el-table-column>
                 <el-table-column prop="showType" label='款型' width='100' align='center'>
                 </el-table-column>
                 <el-table-column  label='首页显示图片' align='center'>
                     <template scope="scope">
-                       <img style="width:50%" :src="scope.row.smallPic"/>
+                       <img style="width:50%" :src="tableImgSrc(scope.row.smallPic)"/>
                     </template>
                 </el-table-column>
-                <el-table-column prop="swipePic" label='轮播图片' align='center'>
-                </el-table-column>
-                <el-table-column label='操作' align='center' width='150'>
+                <el-table-column label='操作' align='center' width='140'>
                     <template scope="scope">
                         <el-row>
-                            <el-button size="small" type="primary" @click="onDelete(scope.$index, scope.row.id)">删除</el-button>
+                            <el-button size="small" type="primary" @click="onDelete(scope.$index, scope.row)">删除</el-button>
                             <el-button size="small" type="primary" @click="onOpenDialog(scope.row)">修改</el-button>
                         </el-row>
                     </template>
@@ -48,7 +56,7 @@
             <el-pagination :current-page="curPage" :page-sizes="[10, 20, 30, 40]" :page-size="pageSize" layout="sizes, prev, pager, next" :total="total" @size-change="handle_setPageSize" @current-change="handle_setCurPage">
             </el-pagination>
         </el-row>
-        <el-dialog :visible.sync="v_form" :close-on-press-escape="false" :close-on-click-modal="false">
+        <el-dialog :visible.sync="v_form" :close-on-press-escape="false" :close-on-click-modal="false" @close="oncloseDialog">
             <el-form ref="form" :model="form" label-width="80px">
                 <el-form-item label="商品名称">
                     <el-input v-model="form.name"></el-input>
@@ -67,7 +75,7 @@
                 </el-form-item>
                 <el-form-item label="首页图片">
                     <el-upload style="float:left" class="upload-demo" ref="upload" :action="''" disabled :show-file-list="false" :auto-upload="false" list-type="picture-card">
-                        <img v-if="form.smallPic" :src="imgSrc" class="avatar" style="max-width:100px">
+                        <img v-if="form.smallPic" :src="imgSrc" class="avatar" style="max-width:100px" v-on:click="handleClick">
                         <i v-else class="el-icon-plus avatar-uploader-icon" v-on:click="handleClick"></i>
                     </el-upload>
                     <input type="file" id="uploadfile" accept="audio/mpeg,image/png,image/jpeg" style="display:none;width:250px;" v-on:change="getFileInfo" />
@@ -104,7 +112,7 @@
                     <el-button style="float:left"  type="primary" @click="resetProduce">重置</el-button>
                 </el-form-item>
                 <el-form-item>
-                    <el-button type="primary" @click="onSubmit">立即创建</el-button>
+                    <el-button type="primary" @click="onSubmit">保存</el-button>
                     <el-button @click="v_form=false">取消</el-button>
                 </el-form-item>
             </el-form>
@@ -124,7 +132,7 @@ export default {
                 introNum: '',
                 showType: '',
                 smallPic: '',
-                swiperPic: ''
+                swipePic: ''
             },
             filters: {
                 name: ''
@@ -134,13 +142,15 @@ export default {
                 alias:'',
                 price:''
             },
+            old_smallPic:'',
             fileDisplayList:[], //轮播图片的显示列表
             fileList_1:[], //首页的图片
             fileList_2:[], //轮播的图片
-            deleteList:[], //删除的图片的列表
             options4: [],
             tableData: [],
             produceTable:[],
+            updateList:[], //修改的补充
+            deleteList:[], //修改的删除
             listLoading: false,
             loading: false,
             v_form: false,
@@ -156,19 +166,81 @@ export default {
     computed:{
         imgSrc() {
             if(this.form.smallPic.indexOf('http')<0){
-                return window.gloabl.serverAdr+'/'+this.form.smallPic
+                return window.global.serverAdr+'/'+this.form.smallPic
             }else{
                 return this.form.smallPic
             }
         }
     },
     methods: {
+        freshConfig:function(){
+            this.$confirm('是否确定现在刷数据, 是否继续?', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+            }).then(() => {
+                this.$http.get(window.global.debugUrl + "freshConfig").then((res) => {
+                    if(res.body.ok===1){
+                        this.$message({
+                            type: 'success',
+                            message: '刷新成功'
+                        })
+                    }
+                })
+            }).catch(() => {
+                this.$message({
+                    type: 'info',
+                    message: '已取消'
+                });
+            });
+            
+        },
+        sortGoodsContent(goods) {
+            var goodsObj = JSON.parse(goods)
+            var res = []
+            for(var key in goodsObj){
+                var g = goodsObj[key]
+                var obj = {}
+                obj.pid = key
+                obj.alias = g.alias
+                obj.price = g.price
+                res.push(obj)
+            }
+            return res
+        },
+        oninitData(){
+            this.isModify = false
+            this.goods = {
+                pid:'',
+                alias:'',
+                price:''
+            }
+            this.form = {
+                name: '',
+                showPrice: '',
+                intro: '',
+                introNum: '',
+                showType: '',
+                smallPic: '',
+                swipePic:''
+            },
+            this.fileList_1=[] //首页的图片
+            this.fileList_2=[] //轮播的图片
+            this.fileDisplayList=[]
+            this.produceTable=[]
+            this.updateList=[]
+            this.deleteList=[]
+        },
+        oncloseDialog() {
+            console.log("关闭对话框")
+            this.oninitData()
+        },
+        tableImgSrc(smallPic){
+            return window.global.serverAdr+'/'+smallPic
+        },
         onSelected(value) {
             if (value == '') return
             var storage = this.storages[value]
-            // this.sizes = storage.size.split(',')
-            // this.colors = storage.color.split(",");
-            // console.log(this.colors)
         },
         remoteMethod(query) {
             if (query !== '') {
@@ -196,7 +268,6 @@ export default {
                 this.$alert('请输入货号');
                 return
             }
-            
             if (this.goods.alias.toString().trim() === '') {
                 this.$alert('请输入别名');
                 return
@@ -205,20 +276,38 @@ export default {
                 this.$alert('请输入价格');
                 return
             }
+            if (this.goods.price.toString().replace(/^[1-9]\d*$/g,'') != '') {
+                this.$alert('价格必须为正整数');
+                return
+            }
             this.produceTable.push(this.goods)
             this.resetProduce()
         },
         onGoodDelete(idx) {
             this.produceTable.splice(idx,1)
         },
+        //判断删除的图片是否是新增加的图片
+        checkRemoveInUpdate(file){
+            for(var k in this.updateList){
+                var url = this.updateList[k].name
+                if(file.url == url){
+                    this.updateList.splice(k,0)
+                    return true
+                }
+            }
+            this.deleteList.push(file.url)
+            return false
+        },
         handleRemove(file, fileList) {
+            if(this.isModify)
+                this.checkRemoveInUpdate(file)
             this.fileDisplayList = fileList
             if(fileList.length==0){
                 this.fileList_2.splice(0,1)
             }else{
                 for (var key in fileList) {
                     var _file = fileList[key]
-                    if (_file.uid > file.uid) {
+                    if (_file.uid > file.uid) { //每天添加图片底层自动添加一个时间戳，通过添加的时间来判断在数组中的位置
                         this.fileList_2.splice(key,1)
                         return
                     }
@@ -240,7 +329,6 @@ export default {
         getFileInfo(evt) {
                 var newImg = this.getObjectURL(evt.target.files[0])
                 var imgName = evt.target.files[0].name;
-                console.log(newImg)
                 this.form.smallPic = newImg
                 this.fileList_1.push(evt.target.files[0])
         },
@@ -251,6 +339,9 @@ export default {
                 var fileObj = {name:imgName,url:newImg}
                 this.fileDisplayList.push(fileObj)
                 this.fileList_2.push(evt.target.files[i]);
+                if(this.isModify){
+                    this.updateList.push({name:newImg,f:evt.target.files[i]})
+                }
             }
         },
         handleClick(e) {
@@ -259,20 +350,18 @@ export default {
         handleSwiperClick(e) {
             document.getElementById('uploadSwiperfile').click()
         },
-        onDelete(_idx,_id) {
+        onDelete(_idx,row) {
             this.$confirm('是否删除该商品, 是否继续?', '提示', {
                 confirmButtonText: '确定',
                 cancelButtonText: '取消',
                 type: 'warning'
             }).then(() => {
-                console.log(_id)
-                this.$http.post(window.global.debugUrl + "delProduce", {id:_id}).then((res) => {
+                this.$http.post(window.global.debugUrl + "delProduce", {id:row.id,swipePic:row.swipePic,smallPic:row.smallPic}).then((res) => {
                     if (res.body.ok) {
                         this.$message({
                             type: 'success',
                             message: '删除成功'
                         })
-                        window.global.staticConfigs.gravida_produce_configs = res.body.ok
                         this.$data.tableData.splice(_idx,1)
                     } else {
                         this.$alert('参数异常', '异常', {
@@ -299,43 +388,58 @@ export default {
                 var _goods = this.produceTable[key]
                 goods[_goods.pid] = {alias:_goods.alias,price:_goods.price}
             }
-            return goods
+            return JSON.stringify(goods)
+        },
+        setProduceContent(_goods){
+            console.log(_goods)
+            var goods =  JSON.parse(_goods)
+            console.log(goods)
+            for(var key in goods){
+                var g = goods[key]
+                var obj = {}
+                obj.pid = key
+                obj.alias = g.alias
+                obj.price = g.price
+                this.produceTable.push(obj)
+            }
         },
         onSubmit() {
-            // if (this.form.name.toString().trim() == '') {
-            //     this.$alert('请输入货号');
-            //     return
-            // }
-            // if (this.form.showPrice.toString().trim() == '') {
-            //     this.$alert('请输入货品名称');
-            //     return
-            // }
-            
-            // if (this.form.intro.toString().trim() != '') {
-            //     this.$alert('未提交图片颜色配置');
-            //     return
-            // }
-            // if (this.form.introNum.toString().trim() != '') {
-            //     this.$alert('未提交图片颜色配置');
-            //     return
-            // }
-            // if (this.form.showType.toString().trim() != '') {
-            //     this.$alert('未提交图片颜色配置');
-            //     return
-            // }
-            // if (this.form.smallPic.toString().trim() != '') {
-            //     this.$alert('未提交图片颜色配置');
-            //     return
-            // }
-            // if (this.form.swiperPic.toString().trim() != '') {
-            //     this.$alert('未提交图片颜色配置');
-            //     return
-            // }
+            if (this.form.name.toString().trim() == '') {
+                this.$alert('请输入商品名称');
+                return
+            }
+            if (this.form.showPrice.toString().trim() == '') {
+                this.$alert('请输入商品价格');
+                return
+            }
+           
+            if (this.form.introNum.toString().trim() == '') {
+                this.$alert('请输入商品介绍的图片张数');
+                return
+            }
+            if (this.form.showType.toString().trim() == '') {
+                this.$alert('请输入显示鞋型');
+                return
+            }
+            if (this.form.smallPic.toString().trim() == '') {
+                this.$alert('请添加首页的图片');
+                return
+            }
+            if (!this.isModify && this.fileList_1.length == 0) {
+                this.$alert('请添加首页的图片');
+                return
+            }
+            // fileList_1:[], //首页的图片
+            // fileList_2:[], //轮播的图片
+            if (this.fileDisplayList.length == 0) {
+                this.$alert('请添加轮播的图片');
+                return
+            }
 
-            // if (this.produceTable.length == 0) {
-            //     this.$alert('请配置货品信息');
-            //     return
-            // }
+            if (this.produceTable.length == 0) {
+                this.$alert('请配置货品信息');
+                return
+            }
 
             var formData = new FormData()
             formData.append('showPrice', this.form.showPrice);
@@ -344,11 +448,17 @@ export default {
             formData.append('introNum', this.form.introNum);
             formData.append('showType', this.form.showType);
             formData.append('goods', this.getProduceContent());
+            formData.append('smallPic', this.old_smallPic);
             if(this.isModify){
-                var idxstr = ''
+                formData.append('id', this.form.id);
+                formData.append('swipePic', this.form.swipePic);
+                if(this.fileList_1.length>0){
+                    formData.append('hasHome', 1)
+                    formData.append('cps', this.fileList_1[0])
+                }
                 for (var key in this.updateList) {
                     var co = this.updateList[key]
-                    formData.append('cps', co.file);
+                    formData.append('cps', co.f);
                 }
             }else{
                 formData.append('cps', this.fileList_1[0]);
@@ -359,24 +469,11 @@ export default {
             }
 
             if(this.deleteList.length>0){
-                var delPos = {}
-                delPos.fileNames = this.deleteList
-                this.$http.post(window.global.debugUrl + "/delimgs", delPos).then((res) => {
-                if (res.body.ok==1) {
-                   this.saveProduce(formData)
-                }
-                this.deleteList = []
-            },
-                (res) => {
-                    this.deleteList = []
-                })
+                formData.append('del', this.deleteList);
             }
-            else{
-                this.saveProduce(formData)
-            }
+            this.saveProduce(formData)
         },
         saveProduce(formData){
-            console.log(window.global.debugUrl)
             this.$http.post(window.global.serverAdr + "/saveProduceConfig", formData).then((res) => {
                 if (res.body.ok) {
                     this.$message({
@@ -384,10 +481,7 @@ export default {
                         message: '录入成功'
                     })
                     this.$data.v_form = false
-                    this.$data.form = {
-                        color: '',
-                    }
-                    window.global.staticConfigs.gravida_produce_configs = res.body.ok
+                    this.oninitData()
                 } else {
                     this.$alert('参数异常', '异常', {
                         confirmButtonText: '确定'
@@ -400,6 +494,15 @@ export default {
                     this.$data.listLoading = false
                 })
         },
+        setImgDisplay(swiperPics){
+            var swiperPicArr = swiperPics.split(',')
+            for(var k in swiperPicArr){
+                var swiperPic = window.global.serverAdr+'/'+swiperPicArr[k]
+                var fileObj = {name:'',url:swiperPic}
+                this.fileDisplayList.push(fileObj)
+            }
+            
+        },
         onOpenDialog(row) {
             if (row) {
                 this.isModify = true
@@ -411,24 +514,13 @@ export default {
                     introNum: row.introNum,
                     showType: row.showType,
                     smallPic: row.smallPic,
-                    swiperPic: row.swiperPic
+                    swipePic: row.swipePic,
                 }
+                this.setProduceContent(row.goods)
+                this.setImgDisplay(row.swipePic)
+                this.old_smallPic = row.smallPic
             } else {
                 this.isModify = false
-                delete this.form.id;
-                this.form =  {
-                    id:'',
-                    name: '',
-                    showPrice: '',
-                    intro: '',
-                    introNum: '',
-                    showType: '',
-                    smallPic: '',
-                    swiperPic: ''
-                }
-                this.fileDisplayList = []
-                this.fileList_1 = []
-                this.fileList_2 = []
             }
             this.v_form = true
         },

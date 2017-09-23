@@ -27,6 +27,9 @@
                     <template scope="scope">
                         <el-row>
                             <el-button size="small" type="primary" @click="onOpenDialog(scope.$index, scope.row)">修改</el-button>
+                            <!--
+                            <el-button size="small" type="primary" @click="onDelete(scope.$index, scope.row.id)">删除</el-button>
+                            -->
                         </el-row>
                     </template>
                 </el-table-column>
@@ -80,7 +83,7 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item>
-                    <el-button type="primary" @click="onSubmit">立即创建</el-button>
+                    <el-button type="primary" @click="onSubmit">保存</el-button>
                     <el-button @click="v_form=false">取消</el-button>
                 </el-form-item>
             </el-form>
@@ -132,7 +135,6 @@ export default {
             // return window.global.serverAdr+'/saveGoodCps'
             return ''
         }
-       
     },
     methods: {
         imgSrc(pic) {

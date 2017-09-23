@@ -42,7 +42,8 @@
                 </el-table-column>
                 <el-table-column width='200' label='订单信息' align='center'>
                     <template scope="scope">
-                        <el-row>NO:{{scope.row.id}}</el-row>
+                        <el-row v-if="status==5">NO:{{scope.row.orderid}}</el-row>
+                        <el-row v-else>NO:{{scope.row.id}}</el-row>
                         <el-row>{{createdateformatter(scope.row)}}</el-row>
                     </template>
                 </el-table-column>
@@ -53,7 +54,7 @@
                         <el-row>{{scope.row.address}}</el-row>
                     </template>
                 </el-table-column>
-                <el-table-column v-if="isOprStatus" :label="statusLabel" width='100' align='center' :show-overflow-tooltip="true">
+                <el-table-column v-if="isOprStatus" :label="statusLabel" width="200" align='center' :show-overflow-tooltip="true">
                     <template scope="scope">
                         <el-row>
                             <el-button v-if="scope.row.status == 1" size="small" @click="open2(scope.$index, scope.row)">开始备货</el-button>

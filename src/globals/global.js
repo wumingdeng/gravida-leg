@@ -2,8 +2,9 @@
 // 1.if you use import xx from thismodule,will use default
 // 2.if you use import {xx} from this module,will use the varible have name of xx and will be read only
 // 3.if you use import * as xx from thismoudele,will use all as one object name xx
-var  webConfig = require('../../static/config_local.json')
+// var  webConfig = require('../../static/config_local.json')
 // var  webConfig = require('../../static/config_test.json')
+var  webConfig = require('../../static/config_139.json')
 // var  webConfig = require('../../static/config_121.json')
 
 console.log(process.env.NODE_ENV )
@@ -21,8 +22,7 @@ export default {
     },
     "gravida_color_configs":{
       "1":{"id":1,"index":1,"color":"黑色"},
-      "2":{"id":2,"index":2,"color":"红色"},
-      "3":{"id":3,"index":3,"color":"绿色"},
+      "2":{"id":2,"index":2,"color":"红色"},       "3":{"id":3,"index":3,"color":"绿色"},
       "4":{"id":4,"index":4,"color":"黄色"},
       "5":{"id":5,"index":5,"color":"粉色"},
       "6":{"id":6,"index":6,"color":"棕色"},
