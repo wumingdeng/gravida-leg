@@ -15,6 +15,8 @@ import goods_config from '../views/goods/goods_config.vue';
 import produce_config from '../views/goods/produce_config.vue';
 import desc_config from '../views/goods/desc_config.vue';
 import goods_list from '../views/goods/goods_list.vue';
+import platform from '../views/platform/platform.vue';
+import platform_user from '../views/platform/platform_user.vue';
 import operate from '../views/storage/operate.vue';
 import test from '../views/test.vue';
 import NotFound from '../views/NotFound.vue';
@@ -34,6 +36,7 @@ export default [
             { path: '/weishouhuo', component: order, name: "待收货记录" },
             { path: '/fahuo', component: order, name: "已发货记录" },
             { path: '/pingjia', component: order, name: "已评价记录" },
+            { path: '/all', component: order, name: "所有订单记录" },
             { path: '/visit', component: visit, name: "就诊列表" },
             { path: '/report/:no', component: report, name: "客人报告" },
             { path: '/visiter/:no', component: visiter, name: "客人信息" },
@@ -48,17 +51,17 @@ export default [
             { path: '/out_storage', component: operate, name: "出库操作" },
             { path: '/produce_config', component: produce_config, name: "商品配置" },
             { path: '/desc_config', component: desc_config, name: "原因配置" },
-           
+            { path: '/platform', component: platform, name: "平台配置" },
+            { path: '/platform_user', component: platform_user, name: "平台用户" },
         ],
         beforeEnter: (to, from, next) => {
             window.scrollTo(0, 0)
             var user = getCookie('user')
-            console.log(user)
+            // console.log(to.path)
             if (user == undefined || user == null || user == 'null') {
                 console.log("返回登陆界面")
                 next('/')
             } else {
-                console.log('当前页面')
                 next()
             }
         }

@@ -18,47 +18,53 @@
         </el-col>
         <el-col :span="24" class="main">
             <aside :class="collapsed?'menu-collapsed':'menu-expanded'">
-                <el-menu default-active="/weifukuan" theme="dark" :router="true" unique-opened>
-                    <el-submenu index="1" v-if="getWeight('0')">
+                <el-menu :default-active="active" theme="dark" :router="true" unique-opened ref="menu">
+                    <el-submenu index="1" v-if="getWeight('1')">
                         <template slot="title">订单管理</template>
-                        <el-menu-item index="/weifukuan">待付款
+                        <el-menu-item index="/weifukuan" v-if="getWeight('101')">待付款
                             <div v-if="s1_cout>0" class="notice">{{s1_cout}}</div>
                         </el-menu-item>
-                        <el-menu-item index="/fukuan">待备货
+                        <el-menu-item index="/fukuan" v-if="getWeight('102')">待备货
                             <div v-if="s2_cout>0" class="notice">{{s2_cout}}</div>
                         </el-menu-item>
-                        <el-menu-item index="/weishouhuo">待发货
+                        <el-menu-item index="/weishouhuo" v-if="getWeight('103')">待发货
                             <div v-if="s3_cout>0" class="notice">{{s3_cout}}</div>
                         </el-menu-item>
-                        <el-menu-item index="/fahuo">已发货
+                        <el-menu-item index="/fahuo" v-if="getWeight('104')">已发货
                             <div v-if="s4_cout>0" class="notice">{{s4_cout}}</div>
                         </el-menu-item>
-                        <el-menu-item index="/shouhuo">已收货
+                        <el-menu-item index="/shouhuo" v-if="getWeight('105')">已收货
                             <div v-if="s5_cout>0" class="notice">{{s5_cout}}</div>
                         </el-menu-item>
-                        <el-menu-item index="/pingjia">已评价
+                        <el-menu-item index="/pingjia" v-if="getWeight('106')">已评价
                             <div v-if="s6_cout>0" class="notice">{{s6_cout}}</div>
                         </el-menu-item>
+                        <el-menu-item index="/all" v-if="getWeight('107')">所有订单</el-menu-item>
                     </el-submenu>
-                    <el-menu-item index="/user" v-if="getWeight('1')">用户管理</el-menu-item>
-                    <el-menu-item index="/hospital" v-if="getWeight('2')">医院管理</el-menu-item>
-                    <el-submenu index="2">
+                    <el-submenu index="2" v-if="getWeight('4')">
                         <template slot="title">文本配置</template>
-                        <el-menu-item index="/gravida_list">孕周配置</el-menu-item>
-                        <el-menu-item index="/weight_list">体重评估配置</el-menu-item>
+                        <el-menu-item index="/gravida_list" v-if="getWeight('401')">孕周配置</el-menu-item>
+                        <el-menu-item index="/weight_list" v-if="getWeight('402')">体重评估配置</el-menu-item>
                     </el-submenu>
-                    <el-submenu index="3">
+                    <el-submenu index="3" v-if="getWeight('5')">
                         <template slot="title">入库分销</template>
-                        <el-menu-item index="/in_storage">入库</el-menu-item>
-                        <el-menu-item index="/out_storage">出库</el-menu-item>
-                        <el-menu-item index="/goods_list">记录明细</el-menu-item>
+                        <el-menu-item index="/in_storage" v-if="getWeight('501')">入库</el-menu-item>
+                        <el-menu-item index="/out_storage" v-if="getWeight('502')">出库</el-menu-item>
+                        <el-menu-item index="/goods_list" v-if="getWeight('503')">记录明细</el-menu-item>
                     </el-submenu>
-                    <el-submenu index="4">
+                    <el-submenu index="4" v-if="getWeight('6')">
                         <template slot="title">货品配置</template>
-                        <el-menu-item index="/goods_config">货号配置</el-menu-item>
-                        <el-menu-item index="/produce_config">商品配置</el-menu-item>
-                        <el-menu-item index="/desc_config">原因配置</el-menu-item>
+                        <el-menu-item index="/goods_config" v-if="getWeight('601')">货号配置</el-menu-item>
+                        <el-menu-item index="/produce_config" v-if="getWeight('602')">商品配置</el-menu-item>
+                        <el-menu-item index="/desc_config" v-if="getWeight('603')">原因配置</el-menu-item>
                     </el-submenu>
+                    <el-submenu index="5" v-if="getWeight('7')">
+                        <template slot="title">平台配置</template>
+                        <el-menu-item index="/platform" v-if="getWeight('701')">平台配置</el-menu-item>
+                        <el-menu-item index="/platform_user" v-if="getWeight('702')">平台用户</el-menu-item>
+                    </el-submenu>
+                    <el-menu-item index="/user" v-if="getWeight('2')">用户管理</el-menu-item>
+                    <el-menu-item index="/hospital" v-if="getWeight('3')">医院管理</el-menu-item>
                 </el-menu>
             </aside>
             <section class="content-container">
@@ -67,7 +73,7 @@
                         <strong class="title">{{$route.name}}</strong>
                         <el-breadcrumb separator="/" class="breadcrumb-inner">
                             <el-breadcrumb-item v-for="item in $route.matched" :key="item.path">
-                                {{ item.name }}
+                                {{item.name}}
                             </el-breadcrumb-item>
                         </el-breadcrumb>
                     </el-col>
@@ -98,7 +104,8 @@ export default {
             s4_cout: 0,
             s5_cout: 0,
             s6_cout: 0,
-            weight: []
+            weight: [],
+            active:'/weifukuan',
         }
     },
     methods: {
@@ -128,15 +135,65 @@ export default {
         },
         //折叠导航栏
         collapse: function() {
-            console.log("asdjfjaslkdjfkl")
             this.collapsed = !this.collapsed;
         },
         showMenu(i, status) {
             this.$refs.menuCollapsed.getElementsByClassName('submenu-hook-' + i)[0].style.display = status ? 'block' : 'none';
         },
+        setNvDispaly(index,parent){
+            if(this.weight.indexOf(parent) >= 0){
+                return true
+            }else{
+                return this.weight.indexOf(index) >= 0
+            }
+        },
+        setParentNvDisplay(parent){
+            if(this.weight.indexOf(parent) >= 0){
+                return true
+            }else{
+                for(var k in this.weight){
+                    var weight = this.weight[k]
+                    var num = Math.floor(Number(weight)/100)
+                    if(num === Number(parent)){
+                        return true
+                    }
+                }
+                return false
+            }
+        },
         getWeight(index) {
-            console.log(this.weight.toString())
-            return this.weight.indexOf(index) > -1
+            var num = Math.floor(Number(index)/100)
+            if(num == 1){
+                return this.setNvDispaly(index,'1')
+            }else if(num == 2){
+                return this.setNvDispaly(index,'2')
+            }else if(num == 3){
+                return this.setNvDispaly(index,'3')
+            }else if(num == 4){
+                return this.setNvDispaly(index,'4')
+            }else if(num == 5){
+                return this.setNvDispaly(index,'5')
+            }else if(num == 6){
+                return this.setNvDispaly(index,'6')
+            }else if(num == 7){
+                return this.setNvDispaly(index,'7')
+            }else if(index=='1'){
+                return this.setParentNvDisplay(index)
+            }else if(index=='2'){
+                return this.setParentNvDisplay(index)
+            }else if(index=='3'){
+                return this.setParentNvDisplay(index)
+            }else if(index=='4'){
+                return this.setParentNvDisplay(index)
+            }else if(index=='5'){
+                return this.setParentNvDisplay(index)
+            }else if(index=='6'){
+                return this.setParentNvDisplay(index)
+            }else if(index=='7'){
+                return this.setParentNvDisplay(index)
+            }else{
+                return false
+            }
         },
         //getOrdersCount
         getOrderCount() {
@@ -144,7 +201,6 @@ export default {
                 if (res.body.d) {
                     var counts = res.body.d.count
                     var rows = res.body.d.rows
-                    console.log("counts.length :"+counts.length)
                     for(var i=0;i<counts.length;i++){
                         var co = counts[i]
                         var row = rows[i]
@@ -184,7 +240,6 @@ export default {
     },
     mounted() {
         eventBus.$on("onselectedOrder", function(arg) {
-            console.log("剩余"+arg)
             var status = arg.st
             var count = arg.count
             switch (status) {
@@ -193,7 +248,7 @@ export default {
                     this.$data.s2_cout++
                     break;
                 case 1:
-                    this.$data.s2_cout = count
+                    this.$data.s2_cout = count 
                     this.$data.s3_cout++
                     break;
                 case 2:
@@ -208,6 +263,10 @@ export default {
             }
         }.bind(this))
         this.getOrderCount()
+        if(window.global.page != ''){
+            console.log("刷新页面："+window.global.page)
+            this.active = '/'+window.global.page
+        }
     }
 }
 </script>

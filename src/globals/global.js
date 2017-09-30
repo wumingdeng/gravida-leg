@@ -3,8 +3,8 @@
 // 2.if you use import {xx} from this module,will use the varible have name of xx and will be read only
 // 3.if you use import * as xx from thismoudele,will use all as one object name xx
 // var  webConfig = require('../../static/config_local.json')
-// var  webConfig = require('../../static/config_test.json')
-var  webConfig = require('../../static/config_139.json')
+var  webConfig = require('../../static/config_test.json')
+// var  webConfig = require('../../static/config_139.json')
 // var  webConfig = require('../../static/config_121.json')
 
 console.log(process.env.NODE_ENV )
@@ -22,7 +22,8 @@ export default {
     },
     "gravida_color_configs":{
       "1":{"id":1,"index":1,"color":"黑色"},
-      "2":{"id":2,"index":2,"color":"红色"},       "3":{"id":3,"index":3,"color":"绿色"},
+      "2":{"id":2,"index":2,"color":"红色"},       
+      "3":{"id":3,"index":3,"color":"绿色"},
       "4":{"id":4,"index":4,"color":"黄色"},
       "5":{"id":5,"index":5,"color":"粉色"},
       "6":{"id":6,"index":6,"color":"棕色"},
@@ -50,5 +51,16 @@ export default {
     AUTO_CANCELED:9  //时间到默认取消
   },
   err:{
+    WRONG_SESSION_ERROR:-2, //session 异常
+    WRONG_SQL:-1,
+    WRONG_USER:101, //用户
+    WRONG_PARAM:102, //错误参数
+    WRONG_USER_EXIST:103,//用户名已存在
+    WRONG_WEIGHT:104, //权限不足
+    WRONG_EXIST:106, //记录存在
+  },
+  regex:{
+    number:/^[1-9]\d*$/g,
+    ip:/((?:(?:25[0-5]|2[0-4]\d|((1\d{2})|([1-9]?\d)))\.){3}(?:25[0-5]|2[0-4]\d|((1\d{2})|([1-9]?\d))))/g,
   }
 }

@@ -357,12 +357,16 @@ export default {
                 type: 'warning'
             }).then(() => {
                 this.$http.post(window.global.debugUrl + "delProduce", {id:row.id,swipePic:row.swipePic,smallPic:row.smallPic}).then((res) => {
-                    if (res.body.ok) {
+                    if (res.body.ok === 1) {
                         this.$message({
                             type: 'success',
                             message: '删除成功'
                         })
                         this.$data.tableData.splice(_idx,1)
+                    }else if(res.body.ok === window.global.err.WRONG_WEIGHT){
+                        this.$alert('权限不足', '提示', {
+                            confirmButtonText: '确定'
+                        });
                     } else {
                         this.$alert('参数异常', '异常', {
                             confirmButtonText: '确定'
@@ -475,13 +479,21 @@ export default {
         },
         saveProduce(formData){
             this.$http.post(window.global.serverAdr + "/saveProduceConfig", formData).then((res) => {
-                if (res.body.ok) {
+                if (res.body.ok===1) {
                     this.$message({
                         type: 'success',
                         message: '录入成功'
                     })
                     this.$data.v_form = false
                     this.oninitData()
+                }else if(res.body.ok === window.global.err.WRONG_SESSION_ERROR){
+                    this.$alert('session过期,请重新登陆', '提示', {
+                        confirmButtonText: '确定'
+                    });
+                }else if(res.body.ok === window.global.err.WRONG_WEIGHT){
+                    this.$alert('权限不足', '提示', {
+                        confirmButtonText: '确定'
+                    });
                 } else {
                     this.$alert('参数异常', '异常', {
                         confirmButtonText: '确定'

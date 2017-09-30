@@ -27,9 +27,7 @@
                     <template scope="scope">
                         <el-row>
                             <el-button size="small" type="primary" @click="onOpenDialog(scope.$index, scope.row)">修改</el-button>
-                            <!--
                             <el-button size="small" type="primary" @click="onDelete(scope.$index, scope.row.id)">删除</el-button>
-                            -->
                         </el-row>
                     </template>
                 </el-table-column>
@@ -309,13 +307,25 @@ export default {
             }).then(() => {
                 console.log(_id)
                 this.$http.post(window.global.debugUrl + "delGoodsConfig", { id: _id }).then((res) => {
-                    if (res.body.ok) {
+                    if (res.body.ok===1) {
                         this.$message({
                             type: 'success',
                             message: '删除成功'
                         })
                         window.global.staticConfigs.gravida_storage_configs = res.body.ok
                         this.$data.tableData.splice(_idx, 1)
+                    }else if(res.body.ok===window.global.err.WRONG_SESSION_ERROR){
+                        this.$alert('session过期，请重新登陆', '异常', {
+                            confirmButtonText: '确定'
+                        });
+                    }else if(res.body.ok===window.global.err.WRONG_EXIST){
+                        this.$alert('已有产生对应的记录无法删除', '异常', {
+                            confirmButtonText: '确定'
+                        });
+                    }else if(res.body.ok===window.global.err.WRONG_WEIGHT){
+                        this.$alert('权限不足', '异常', {
+                            confirmButtonText: '确定'
+                        }); 
                     } else {
                         this.$alert('参数异常', '异常', {
                             confirmButtonText: '确定'
@@ -428,7 +438,15 @@ export default {
         },
         saveGoodCps(formData) {
             this.$http.post(window.global.serverAdr + "/saveGoodCps", formData).then((res) => {
-                if (res.body.ok) {
+                if (res.body.ok === window.global.err.WRONG_WEIGHT) {
+                    this.$alert('权限不足', '提示', {
+                        confirmButtonText: '确定'
+                    });
+                }else if(res.body.ok===window.global.err.WRONG_SESSION_ERROR){
+                    this.$alert('session过期，请重新登陆', '异常', {
+                        confirmButtonText: '确定'
+                    });
+                }else if (res.body.ok) {
                     this.$message({
                         type: 'success',
                         message: '录入成功'
@@ -561,7 +579,6 @@ export default {
         },
     },
     mounted() {
-        console.log("mounted")
         this.getStaticConfigs()
         this.getConfigs()
     }

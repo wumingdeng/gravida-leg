@@ -69,6 +69,22 @@
                         </el-row>
                     </template>
                 </el-table-column>
+                <el-table-column v-if="isAll" label="状态" width="200" align='center'>
+                    <template scope="scope">
+                        <el-row>
+                            <el-col v-if="scope.row.status == 0" >待付款</el-col>
+                            <el-col v-else-if="scope.row.status == 1" >待备货</el-col>
+                            <el-col v-else-if="scope.row.status == 2" >待发货</el-col>
+                            <el-col v-else-if="scope.row.status == 3" >已发货</el-col>
+                            <el-col v-else-if="scope.row.status == 4" >买家收货</el-col>
+                            <el-col v-else-if="scope.row.status == 5" >已评价</el-col>
+                            <el-col v-else-if="scope.row.status == 6" >用户取消订单</el-col>
+                            <el-col v-else-if="scope.row.status == 7" >已退款</el-col>
+                            <el-col v-else-if="scope.row.status == 8" >默认收货</el-col>
+                            <el-col v-else-if="scope.row.status == 9" >默认取消订单</el-col>
+                        </el-row>
+                    </template>
+                </el-table-column>
             </el-table>
         </el-row>
         <el-row type="flex" justify="end" style="padding:20px 0; ">
@@ -134,29 +150,6 @@ export default {
             change: false,
             formLabelWidth: '120px',
             options:expNos.data,
-            // options: [
-            //     { key: "AJ", value: "安捷快递" },
-            //     { key: "BTWL", value: "百世快运" },
-            //     { key: "DBL", value: "德邦" },
-            //     { key: "EMS", value: "EMS" },
-            //     { key: "FEDEX", value: "FEDEX联邦(国内件）" },
-            //     { key: "FEDEX_GJ", value: "FEDEX联邦(国际件)" },
-            //     { key: "GTO", value: "国通快递" },
-            //     { key: "HHTT", value: "天天快递" },
-            //     { key: "HTKY", value: "百世快递" },
-            //     { key: "SF", value: "顺丰快递" },
-            //     { key: "STO", value: "申通快递" },
-            //     { key: "YD", value: "韵达快递" },
-            //     { key: "YTO", value: "圆通速递" },
-            //     { key: "YZPY", value: "邮政平邮/小包" },
-            //     { key: "ZJS", value: "宅急送" },
-            //     { key: "ZTO", value: "中通速递" },
-            //     { key: "AMAZON", value: "亚马逊物流" },
-            //     { key: "SUBIDA", value: "速必达物流" },
-            //     { key: "CJKD", value: "城际快递" },
-            //     { key: "CNPEX", value: "CNPEX中邮快递" },
-            //     { key: "HPTEX", value: "海派通物流公司" }
-            // ],
             info_exps: []
         }
     },
@@ -221,10 +214,9 @@ export default {
                 pos.amount=row.count,
                 pos.pid=row.shoeid
             }
-            console.log(pos.com_no + " : " + pos.id + " : " + pos.exp_order_no)
             this.$http.post(g.debugUrl + "updateOrders", pos).then((res) => {
                 if (res.body.ok == -2) {
-                    this.$alert('session过期', '异常', {
+                    this.$alert('session过期,请重新登陆', '异常', {
                         confirmButtonText: '确定'
                     });
                 } else if (res.body.ok == -1) {
@@ -233,6 +225,10 @@ export default {
                     });
                 } else if (res.body.ok == 11) {
                     this.$alert('库存不足', '提示', {
+                        confirmButtonText: '确定'
+                    });
+                } else if (res.body.ok == window.global.err.WRONG_WEIGHT) {
+                    this.$alert('权限不足', '提示', {
                         confirmButtonText: '确定'
                     });
                 } else if (res.body.ok == 1) {
@@ -264,7 +260,6 @@ export default {
         createdateformatter(row) {
             var st = row.status
             var temptime = row.updatetime
-            console.log(temptime)
             if(temptime==null || st == 0){
                 temptime = row.createtime
             }else if(st==5){
@@ -316,7 +311,6 @@ export default {
         },
         open2(idx, row) {
             this.$data.change = false
-            console.log("status:" + this.status)
             if (this.status == 2) {
                 this.$data.dialogFormVisible = true
                 this.$data.expForm.idx = idx
@@ -324,7 +318,6 @@ export default {
                 this.$data.expForm.name = ''
                 this.$data.expForm.no = ''
             } else if (this.status == 3) {
-                //   var pos={expNo:3953420657949,expCode:"YD"}
                 var pos = {
                     expNo: row.exp_no,
                     expCode: row.exp_com_no,
@@ -332,7 +325,6 @@ export default {
                 }
                 this.$data.listLoading = true
                 this.$http.post(g.debugUrl + "getExpInfo", pos).then((res) => {
-                    console.log(res)
                     if (res.body.ok == -2) {
                         this.$alert('session过期', '异常', {
                             confirmButtonText: '确定'
@@ -424,20 +416,29 @@ export default {
                 case "/pingjia":
                     this.status = 5
                     break;
+                case "/all":
+                    this.status = -1
+                    break;
                 default:
                     this.status = -1
                     break
             }
+            console.log("当前状态为："+this.status)
         },
         //更新导航栏的计数
         onUpdateNavCount() {
-            console.log("当前数目：" + this.total)
             eventBus.$emit("onselectedOrder", { st: this.status, count: this.total })
+        },
+        setStatutTxt(status){
+
         }
     },
     computed:{
         isOprStatus(){
-            return this.status!=0
+            return this.status===1 || this.status===2 || this.status===3 || this.status===4 ||this.status===5
+        },
+        isAll(){
+            return this.status===-1
         },
         ispjOprStatus(){
             return this.status==5
@@ -453,7 +454,6 @@ export default {
         }
     },
     mounted() {
-        console.log('111111')
         this.getStatus(this.$route.path)
         this.findByPage()
     },

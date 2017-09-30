@@ -70,7 +70,7 @@
                 }
                 setCookie('user', JSON.stringify(user));
                 this.getConfigs()
-                this.$router.push({name:'未付款记录'})
+                this.$router.push({name:'待付款记录'})
               } else if(res.body.ok == 0){
                   this.$alert('登陆失败', '警告', {
                   confirmButtonText: '确定'

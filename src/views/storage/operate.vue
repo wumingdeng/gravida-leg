@@ -231,6 +231,10 @@ export default {
                             this.$alert('库存不足', '提示', {
                                 confirmButtonText: '确定'
                             });
+                        } else if (res.body.ok == window.global.err.WRONG_WEIGHT) {
+                            this.$alert('权限不足', '提示', {
+                                confirmButtonText: '确定'
+                            });
                         } else {
                             this.$alert('数据异常', '异常', {
                                 confirmButtonText: '确定'

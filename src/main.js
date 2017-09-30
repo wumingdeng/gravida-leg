@@ -25,7 +25,7 @@ const router = new VueRouter({
 
 router.afterEach(route => {
     g.page = route.fullPath.substring(1); //保存当前路由 刷新的时候用
-    console.log(g.page)
+    console.log("刷新页面:"+g.page)
 })
 
 window.global = g
